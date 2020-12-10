@@ -51,7 +51,8 @@ eval_step = 1000
 start = time.time()
 loss = 0
 while dqn.agent.train_step_counter.numpy() <= num_iterations:
-    train_env.render()
+    if LOCAL:
+        train_env.render()
     replay_buffer.collect_steps(train_env, dqn.agent.collect_policy)
     experience, _ = next(iterator)
     loss += dqn.agent.train(experience).loss
