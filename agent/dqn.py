@@ -1,4 +1,5 @@
 import tensorflow as tf
+from tensorflow import keras
 from tf_agents.agents import dqn
 from tf_agents.networks import q_network
 from tf_agents.utils import common
@@ -9,10 +10,24 @@ class DQN():
         # Env
         self.env = env
         # Policy
+        self.preprocessing_layers = keras.models.Sequential([  # (96, 96, *)
+            keras.layers.Conv2D(  # (92, 92, 16)
+                filters=16, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
+            keras.layers.MaxPooling2D((2, 2)),  # (46, 46, 16)
+            keras.layers.Conv2D(  # (42, 42, 32)
+                filters=32, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
+            keras.layers.MaxPooling2D((2, 2)),  # (21, 21, 32)
+            keras.layers.Conv2D(  # (10, 10, 64)
+                filters=64, kernel_size=(3, 3), strides=(2, 2), activation='relu'),
+            keras.layers.MaxPooling2D((2, 2)),  # (5, 5, 64)
+            keras.layers.Flatten(),
+            keras.layers.Dense(64, activation='relu'),
+        ])
         self.q_net = q_network.QNetwork(
             self.env.observation_spec(),
             self.env.action_spec(),
-            fc_layer_params=(100,))
+            preprocessing_layers=self.preprocessing_layers,
+            fc_layer_params=(64, 32))
         # Agent
         self.global_step = tf.compat.v1.train.get_or_create_global_step()
         self.optimizer = tf.compat.v1.train.AdamOptimizer(

@@ -1,5 +1,6 @@
 import os
 import time
+import pyvirtualdisplay
 import tensorflow as tf
 from tf_agents.utils import common
 
@@ -22,10 +23,13 @@ POLICY_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               './models/checkpoints')
 
+# Virtual machine for docker
+if not LOCAL:
+    pyvirtualdisplay.Display(visible=0, size=(1400, 900)).start()
+
 # Environment
-tfenv = CartPole.TfEnv()
-train_env = tfenv.gen_env()
-eval_env = tfenv.gen_env()
+train_env = CartPole.env()
+eval_env = CartPole.env()
 
 # Agent
 dqn = DQN(train_env, CHECKPOINT_DIR)
@@ -50,7 +54,8 @@ num_iterations = 1000000
 eval_step = 1000
 start = time.time()
 loss = 0
-while dqn.agent.train_step_counter.numpy() <= num_iterations:
+step = dqn.agent.train_step_counter.numpy()
+while step <= num_iterations:
     if LOCAL:
         train_env.render()
     replay_buffer.collect_steps(train_env, dqn.agent.collect_policy)
