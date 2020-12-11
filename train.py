@@ -1,6 +1,5 @@
 import os
 import time
-import pyvirtualdisplay
 import tensorflow as tf
 from tf_agents.utils import common
 
@@ -22,10 +21,6 @@ POLICY_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                           './models/policy')
 CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               './models/checkpoints')
-
-# Virtual machine for docker
-if not LOCAL:
-    pyvirtualdisplay.Display(visible=0, size=(1400, 900)).start()
 
 # Environment
 train_env = CartPole.env()
