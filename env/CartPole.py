@@ -59,8 +59,7 @@ class PyEnv(py_environment.PyEnvironment):
     def _step(self, action):
         if self._episode_ended:
             return self.reset()
-        _, reward, done, info = self._env.step(action)
-        print(info)
+        _, reward, done, _ = self._env.step(action)
         self.set_state()
         self._episode_ended = done
         if self._episode_ended:
