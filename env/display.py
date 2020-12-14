@@ -1,8 +1,10 @@
 import os
 from pyvirtualdisplay import Display
 
-
-ORIGIN_DISP = os.environ['DISPLAY']
+try:
+    ORIGIN_DISP = os.environ['DISPLAY']
+except:
+    ORIGIN_DISP = None # Docker in case
 DISP = Display(visible=False, size=(1400, 900))
 DISP.start()
 VIRTUAL_DISP = os.environ['DISPLAY']
