@@ -5,6 +5,7 @@ from tf_agents.specs import array_spec
 from tf_agents.environments import py_environment
 from tf_agents.environments import tf_py_environment
 from tf_agents.trajectories import time_step as ts
+from env.display import virtual_display
 
 
 class PyEnv(py_environment.PyEnvironment):
@@ -13,7 +14,7 @@ class PyEnv(py_environment.PyEnvironment):
         # Create env
         self.image_shape = image_shape
         self.input_shape = self.image_shape+(1,)
-        self._env = gym.make("CartPole-v1")
+        self._env = gym.make('CartPole-v1')
         # Env specs
         self._action_spec = array_spec.BoundedArraySpec(
             shape=(), dtype=np.int32,
@@ -28,6 +29,8 @@ class PyEnv(py_environment.PyEnvironment):
 
     def __nomarlize(self, img):
         img = cv.cvtColor(img, cv.COLOR_RGB2GRAY)
+        (h, w) = img.shape
+        img = img[int(h*0.4): int(h*0.8), :]
         img = cv.resize(img, self.image_shape)
         img = np.reshape(img, self.input_shape)
         img = np.array(img/255, dtype=np.float32)
@@ -42,8 +45,9 @@ class PyEnv(py_environment.PyEnvironment):
     def get_state(self):
         return self._state
 
-    def set_state(self):
-        img = self.render()
+    @virtual_display
+    def set_state(self, _unused=None):
+        img = self._env.render(mode='rgb_array')
         observation = self.__nomarlize(img)
         self._state = observation
 
@@ -68,7 +72,9 @@ class PyEnv(py_environment.PyEnvironment):
             return ts.transition(self._state, reward)
 
     def render(self, mode='rgb_array'):
-        img = self._env.render(mode=mode)
+        img = self.get_state()
+        cv.imshow('CartPole-v1', img)
+        cv.waitKey(10)
         return img
 
 
