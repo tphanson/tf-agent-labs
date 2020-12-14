@@ -21,13 +21,13 @@ class DQN():
                 filters=64, kernel_size=(3, 3), strides=(2, 2), activation='relu'),
             keras.layers.MaxPooling2D((2, 2)),  # (5, 5, 64)
             keras.layers.Flatten(),
-            keras.layers.Dense(64, activation='relu'),
+            keras.layers.Dense(512, activation='relu'),
         ])
         self.q_net = q_network.QNetwork(
             self.env.observation_spec(),
             self.env.action_spec(),
             preprocessing_layers=self.preprocessing_layers,
-            fc_layer_params=(64, 32))
+            fc_layer_params=(128, 32))
         # Agent
         self.global_step = tf.compat.v1.train.get_or_create_global_step()
         self.optimizer = tf.compat.v1.train.AdamOptimizer(

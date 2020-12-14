@@ -13,7 +13,7 @@ class PyEnv(py_environment.PyEnvironment):
         super(PyEnv, self).__init__()
         # Create env
         self.image_shape = image_shape
-        self.input_shape = self.image_shape+(1,)
+        self.input_shape = self.image_shape+(3,)
         self._env = gym.make('CartPole-v1')
         # Env specs
         self._action_spec = array_spec.BoundedArraySpec(
@@ -29,10 +29,10 @@ class PyEnv(py_environment.PyEnvironment):
 
     def __nomarlize(self, img):
         img = cv.cvtColor(img, cv.COLOR_RGB2GRAY)
-        (h, w) = img.shape
+        (h, _) = img.shape
         img = img[int(h*0.4): int(h*0.8), :]
         img = cv.resize(img, self.image_shape)
-        img = np.reshape(img, self.input_shape)
+        img = np.reshape(img, self.image_shape+(1,))
         img = np.array(img/255, dtype=np.float32)
         return img
 
@@ -47,12 +47,15 @@ class PyEnv(py_environment.PyEnvironment):
 
     @virtual_display
     def set_state(self, _unused=None):
+        if self._state is None:
+            self._state = np.zeros(self.input_shape, dtype=np.float32)
         img = self._env.render(mode='rgb_array')
         observation = self.__nomarlize(img)
-        self._state = observation
+        self._state = self._state[:, :, 1:]
+        self._state = np.append(self._state, observation, axis=2)
 
     def get_info(self):
-        return None
+        return {}
 
     def _reset(self):
         _ = self._env.reset()
