@@ -3,7 +3,7 @@ from pyvirtualdisplay import Display
 
 try:
     ORIGIN_DISP = os.environ['DISPLAY']
-except:
+except KeyError:
     ORIGIN_DISP = None # Docker in case
 DISP = Display(visible=False, size=(1400, 900))
 DISP.start()
