@@ -10,7 +10,7 @@ class DQN():
         # Env
         self.env = env
         # Policy
-        self.preprocessing_layers = keras.models.Sequential([  # (96, 96, *)
+        self.preprocessing_layers = keras.Sequential([  # (96, 96, *)
             keras.layers.Conv2D(  # (92, 92, 16)
                 filters=16, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
             keras.layers.MaxPooling2D((2, 2)),  # (46, 46, 16)

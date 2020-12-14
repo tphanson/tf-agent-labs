@@ -13,7 +13,7 @@ tf.compat.v1.enable_v2_behavior()
 
 # Trick
 # No GPU: my super-extra-fast-and-furiuos-ahuhu machine
-# GPUs: tranning servers
+# GPUs: training servers
 LOCAL = not len(tf.config.list_physical_devices('GPU')) > 0
 
 # Saving dir
