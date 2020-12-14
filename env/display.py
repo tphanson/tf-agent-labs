@@ -1,10 +1,13 @@
 import os
+import warnings
 from pyvirtualdisplay import Display
 
 try:
     ORIGIN_DISP = os.environ['DISPLAY']
 except KeyError:
-    ORIGIN_DISP = None # Docker in case
+    warnings.warn("""You may be run the process in docker which has no X server.
+     We may set the DISPLAY env to None for avoiding exception""")
+    ORIGIN_DISP = None  # Docker in case
 DISP = Display(visible=False, size=(1400, 900))
 DISP.start()
 VIRTUAL_DISP = os.environ['DISPLAY']
