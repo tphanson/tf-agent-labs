@@ -23,6 +23,7 @@ class PyEnv(py_environment.PyEnvironment):
         self._observation_spec = array_spec.BoundedArraySpec(
             shape=self.input_shape, dtype=np.float32,
             minimum=0, maximum=1, name='observation')
+        # Internal states
         self._state = None
         self._episode_ended = False
         # Reset
@@ -64,8 +65,8 @@ class PyEnv(py_environment.PyEnvironment):
 
     def _reset(self):
         _ = self._env.reset()
-        self._episode_ended = False
         self._state = None
+        self._episode_ended = False
         self.set_state()
         return ts.restart(self._state)
 
@@ -84,12 +85,7 @@ class PyEnv(py_environment.PyEnvironment):
         img = self.get_state()
 
         drawed_img = np.copy(img)
-        # (h, _) = self.image_shape
-        # start, end = (self.destination, 0), (self.destination, h)
-        # color = (0, 0, 255)
-        # thickness = 1
-        # drawed_img = cv.line(
-        #     drawed_img, start, end, color, thickness)
+        drawed_img = cv.cvtColor(drawed_img, cv.COLOR_RGB2BGR)
         drawed_img = cv.resize(drawed_img, (512, 512))
         cv.imshow('CartPole-v1', drawed_img)
         cv.waitKey(10)

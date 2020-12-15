@@ -3,7 +3,7 @@ import time
 import tensorflow as tf
 from tf_agents.utils import common
 
-from env import CartPole
+from env import OhmniInSpace
 from agent.dqn import DQN
 from buffer import ReplayBuffer
 from eval import ExpectedReturn
@@ -23,8 +23,8 @@ CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               './models/checkpoints')
 
 # Environment
-train_env = CartPole.env()
-eval_env = CartPole.env()
+train_env = OhmniInSpace.env()
+eval_env = OhmniInSpace.env()
 
 # Agent
 dqn = DQN(train_env, CHECKPOINT_DIR)
