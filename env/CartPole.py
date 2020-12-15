@@ -14,6 +14,7 @@ class PyEnv(py_environment.PyEnvironment):
         # Create env
         self.image_shape = image_shape
         self.input_shape = self.image_shape+(3,)
+        self.destination = 10
         self._env = gym.make('CartPole-v1')
         # Env specs
         self._action_spec = array_spec.BoundedArraySpec(
@@ -81,8 +82,18 @@ class PyEnv(py_environment.PyEnvironment):
 
     def render(self, mode='rgb_array'):
         img = self.get_state()
-        cv.imshow('CartPole-v1', cv.resize(img, (512, 512)))
+
+        drawed_img = np.copy(img)
+        # (h, _) = self.image_shape
+        # start, end = (self.destination, 0), (self.destination, h)
+        # color = (0, 0, 255)
+        # thickness = 1
+        # drawed_img = cv.line(
+        #     drawed_img, start, end, color, thickness)
+        drawed_img = cv.resize(drawed_img, (512, 512))
+        cv.imshow('CartPole-v1', drawed_img)
         cv.waitKey(10)
+
         return img
 
 
