@@ -18,7 +18,7 @@ INTERPRETER = [[-1, -1], [-0.5, 0.5], [0, 0], [0.5, -0.5], [1, 1]]
 class Env:
     def __init__(self, gui=False, num_of_obstacles=4, image_shape=(96, 96)):
         self.gui = gui
-        self.timestep = 0.005
+        self.timestep = 0.05
         self.num_of_obstacles = num_of_obstacles
         self.image_shape = image_shape
         self.clientId = self._init_ws()
