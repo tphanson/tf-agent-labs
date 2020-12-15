@@ -22,7 +22,7 @@ dqn = DQN(env, CHECKPOINT_DIR)
 dqn.load_checkpoint()
 
 counter = 0
-while counter < 1000:
+while counter < 10000:
     counter += 1
     time_step = env.current_time_step()
     action_step = dqn.agent.policy.action(time_step)
