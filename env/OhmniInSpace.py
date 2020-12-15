@@ -182,6 +182,9 @@ class PyEnv(py_environment.PyEnvironment):
         # Ohmni reach the destination
         if normalized_distance < 0.1:
             return True, 1
+        # If exceed the limitation of steps, return rewards
+        if self._num_steps >= self._max_steps:
+            return True, -1
         # Stop if detecting collisions or a fall
         if self._is_fatal():
             return True, -1
@@ -242,13 +245,10 @@ class PyEnv(py_environment.PyEnvironment):
         self._num_steps += 1
         # Step the environment
         self._env.step(action)
+        done, reward = self._compute_reward()
         # Compute and save states
         self.set_state()
-        self._episode_ended, reward = self._compute_reward()
-        # If exceed the limitation of steps, return rewards
-        if self._num_steps > self._max_steps:
-            self._episode_ended = True
-            return ts.termination(self._state, reward)
+        self._episode_ended = done
         # Transition
         if self._episode_ended:
             return ts.termination(self._state, reward)
