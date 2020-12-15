@@ -245,8 +245,6 @@ class PyEnv(py_environment.PyEnvironment):
         # Compute and save states
         self.set_state()
         self._episode_ended, reward = self._compute_reward()
-        if self._env.gui:
-            print('Reward: {}'.format(reward))
         # If exceed the limitation of steps, return rewards
         if self._num_steps > self._max_steps:
             self._episode_ended = True
