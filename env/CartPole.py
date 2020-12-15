@@ -47,10 +47,14 @@ class PyEnv(py_environment.PyEnvironment):
 
     @virtual_display
     def set_state(self, _unused=None):
-        if self._state is None:
-            self._state = np.zeros(self.input_shape, dtype=np.float32)
         img = self._env.render(mode='rgb_array')
         observation = self.__nomarlize(img)
+        if self._state is None:
+            init_state = observation
+            (_, _, stack_channel) = self.input_shape
+            for _ in range(stack_channel-1):
+                init_state = np.append(init_state, observation, axis=2)
+            self._state = np.array(init_state, dtype=np.float32)
         self._state = self._state[:, :, 1:]
         self._state = np.append(self._state, observation, axis=2)
 
@@ -59,8 +63,9 @@ class PyEnv(py_environment.PyEnvironment):
 
     def _reset(self):
         _ = self._env.reset()
-        self.set_state()
         self._episode_ended = False
+        self._state = None
+        self.set_state()
         return ts.restart(self._state)
 
     def _step(self, action):
@@ -76,7 +81,7 @@ class PyEnv(py_environment.PyEnvironment):
 
     def render(self, mode='rgb_array'):
         img = self.get_state()
-        cv.imshow('CartPole-v1', img)
+        cv.imshow('CartPole-v1', cv.resize(img, (512, 512)))
         cv.waitKey(10)
         return img
 
