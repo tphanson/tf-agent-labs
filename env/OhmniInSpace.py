@@ -183,8 +183,8 @@ class PyEnv(py_environment.PyEnvironment):
         if normalized_distance < 0.1:
             return True, 1
         # If exceed the limitation of steps, return rewards
-        if self._num_steps >= self._max_steps:
-            return True, -1
+        # if self._num_steps >= self._max_steps:
+        #     return True, -1
         # Stop if detecting collisions or a fall
         if self._is_fatal():
             return True, -1
