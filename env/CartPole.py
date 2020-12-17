@@ -14,7 +14,6 @@ class PyEnv(py_environment.PyEnvironment):
         # Create env
         self.image_shape = image_shape
         self.input_shape = self.image_shape+(3,)
-        self.destination = 10
         self._env = gym.make('CartPole-v1')
         # Env specs
         self._action_spec = array_spec.BoundedArraySpec(
