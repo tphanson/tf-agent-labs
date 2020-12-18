@@ -3,7 +3,7 @@ import time
 import tensorflow as tf
 from tf_agents.utils import common
 
-from env import CartPole
+from env import Pendulum
 from agent.dqn import DQN
 from buffer import ReplayBuffer
 from eval import ExpectedReturn
@@ -23,8 +23,8 @@ CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               './models/checkpoints')
 
 # Environment
-train_env = CartPole.env()
-eval_env = CartPole.env()
+train_env = Pendulum.env()
+eval_env = Pendulum.env()
 
 # Agent
 dqn = DQN(train_env, CHECKPOINT_DIR)
@@ -45,7 +45,7 @@ dataset = replay_buffer.as_dataset()
 iterator = iter(dataset)
 
 # Train
-num_iterations = 10000000
+num_iterations = 1000000
 eval_step = 1000
 start = time.time()
 loss = 0

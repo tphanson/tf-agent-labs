@@ -4,16 +4,19 @@ import matplotlib.pyplot as plt
 class ExpectedReturn:
     def __init__(self):
         self.returns = None
+        self.counter = 1000
 
     def compute_avg_return(self, tfenv, agent, num_episodes):
+        counter = self.counter
         total_return = 0.0
         for _ in range(num_episodes):
             time_step = tfenv.reset()
             episode_return = 0.0
-            while not time_step.is_last():
+            while counter > 0:
                 action_step = agent.action(time_step)
                 time_step = tfenv.step(action_step.action)
                 episode_return += time_step.reward
+                counter -= 1
             total_return += episode_return
         avg_return = total_return / num_episodes
         return avg_return.numpy()[0]

@@ -2,7 +2,7 @@ import os
 import numpy as np
 import tensorflow as tf
 
-from env import CartPole
+from env import Pendulum
 from agent.dqn import DQN
 
 # Compulsory config for tf_agents
@@ -15,7 +15,7 @@ CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               './models/checkpoints')
 
 # Environment
-env = CartPole.env()
+env = Pendulum.env()
 
 # Agent
 dqn = DQN(env, CHECKPOINT_DIR)
