@@ -112,7 +112,7 @@ class PyEnv(py_environment.PyEnvironment):
         # Parameters
         self.image_shape = image_shape
         self.input_shape = self.image_shape + (3,)
-        self._num_of_obstacles = 15
+        self._num_of_obstacles = 0
         # Actions
         self._num_values = 5
         self._values = np.linspace(-1, 1, self._num_values)
