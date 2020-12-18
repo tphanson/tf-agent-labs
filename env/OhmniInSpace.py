@@ -202,7 +202,7 @@ class PyEnv(py_environment.PyEnvironment):
             return False, -1
         # Ohmni on his way
         _, cosine_sim = self._get_pose_state()
-        return False, (cosine_sim-1)/20
+        return False, (cosine_sim-1)/2
 
     def _reset(self):
         """ Reset environment"""
