@@ -157,7 +157,9 @@ class PyEnv(py_environment.PyEnvironment):
             [-orientation[0], -orientation[1], -orientation[2], orientation[3]])
         rel_position = rotation.apply(destination_posistion - position)
         _pose = rel_position[0:2]
-        return _pose.astype(dtype=np.float32)
+        cosine_sim = np.dot([1, 0], _pose) / \
+            (np.linalg.norm([1, 0])*np.linalg.norm(_pose))
+        return _pose.astype(dtype=np.float32), cosine_sim
 
     def _is_finished(self):
         """ Compute the distance from agent to destination """
@@ -199,7 +201,8 @@ class PyEnv(py_environment.PyEnvironment):
         if self._is_collided():
             return False, -1
         # Ohmni on his way
-        return False, -0.01
+        _, cosine_sim = self._get_pose_state()
+        return False, (cosine_sim-1)/20
 
     def _reset(self):
         """ Reset environment"""
@@ -228,7 +231,7 @@ class PyEnv(py_environment.PyEnvironment):
         # Gamifying
         (h, w) = self.image_shape
         _, mask = self._get_image_state()  # Image state
-        pose = self._get_pose_state()  # Pose state
+        pose, _ = self._get_pose_state()  # Pose state
         cent = np.array([w/2, h/2], dtype=np.float32)
         dest = -pose*1000 + cent  # Transpose/Scale/Tranform
         mask = cv.line(mask,
