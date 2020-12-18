@@ -201,8 +201,7 @@ class PyEnv(py_environment.PyEnvironment):
         if self._is_collided():
             return False, -1
         # Ohmni on his way
-        _, cosine_sim = self._get_pose_state()
-        return False, (cosine_sim-1)/2
+        return False, -0.1
 
     def _reset(self):
         """ Reset environment"""
