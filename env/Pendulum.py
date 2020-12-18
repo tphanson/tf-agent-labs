@@ -13,9 +13,9 @@ class PyEnv(py_environment.PyEnvironment):
         super(PyEnv, self).__init__()
         # Create env
         self.image_shape = image_shape
-        # self.input_shape = self.image_shape+(3,)
+        self.input_shape = self.image_shape+(3,)
         self._env = gym.make('Pendulum-v0')
-        self.input_shape = self._env.observation_space.shape
+        # Discretized actions
         self._num_actions = 16
         self._action_ref = np.linspace(
             self._env.action_space.low[0],
@@ -33,15 +33,14 @@ class PyEnv(py_environment.PyEnvironment):
             name='observation')
         self._state = None
         self._episode_ended = False
-        self._img = None
         self._observation = None
         # Reset
         self._reset()
 
     def __nomarlize(self, img):
         img = cv.cvtColor(img, cv.COLOR_RGB2GRAY)
-        (h, _) = img.shape
-        img = img[int(h*0.4): int(h*0.8), :]
+        (h, w) = img.shape
+        img = img[int(h*0.2): int(h*0.8), int(w*0.2): int(w*0.8)]
         img = cv.resize(img, self.image_shape)
         img = np.reshape(img, self.image_shape+(1,))
         img = np.array(img/255, dtype=np.float32)
@@ -59,23 +58,21 @@ class PyEnv(py_environment.PyEnvironment):
     @virtual_display
     def set_state(self, _unused=None):
         img = self._env.render(mode='rgb_array')
-        self._img = img
-        # observation = self.__nomarlize(img)
-        # if self._state is None:
-        #     init_state = observation
-        #     (_, _, stack_channel) = self.input_shape
-        #     for _ in range(stack_channel-1):
-        #         init_state = np.append(init_state, observation, axis=2)
-        #     self._state = np.array(init_state, dtype=np.float32)
-        # self._state = self._state[:, :, 1:]
-        # self._state = np.append(self._state, observation, axis=2)
-        self._state = np.array(self._observation, dtype=np.float32)
+        observation = self.__nomarlize(img)
+        if self._state is None:
+            init_state = observation
+            (_, _, stack_channel) = self.input_shape
+            for _ in range(stack_channel-1):
+                init_state = np.append(init_state, observation, axis=2)
+            self._state = np.array(init_state, dtype=np.float32)
+        self._state = self._state[:, :, 1:]
+        self._state = np.append(self._state, observation, axis=2)
 
     def get_info(self):
         return {}
 
     def _reset(self):
-        self._observation = self._env.reset()
+        self._env.reset()
         self._episode_ended = False
         self._state = None
         self.set_state()
@@ -85,8 +82,7 @@ class PyEnv(py_environment.PyEnvironment):
         action = [self._action_ref[action]]
         if self._episode_ended:
             return self.reset()
-        self._observation, reward, done, _ = self._env.step(action)
-        print("Reward:", reward)
+        _, reward, done, _ = self._env.step(action)
         self.set_state()
         self._episode_ended = done
         if self._episode_ended:
@@ -95,8 +91,7 @@ class PyEnv(py_environment.PyEnvironment):
             return ts.transition(self._state, reward)
 
     def render(self, mode='rgb_array'):
-        # img = self.get_state()
-        img = self._img
+        img = self.get_state()
 
         drawed_img = np.copy(img)
         drawed_img = cv.resize(drawed_img, (512, 512))
