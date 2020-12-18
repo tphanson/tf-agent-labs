@@ -11,8 +11,7 @@ from tf_agents.trajectories import time_step as ts
 
 from env.objs import floor, ohmni, obstacle
 
-VELOCITY_COEFFICIENT = 6
-INTERPRETER = [[-1, -1], [-0.5, 0.5], [0, 0], [0.5, -0.5], [1, 1]]
+VELOCITY_COEFFICIENT = 10
 
 
 class Env:
@@ -92,7 +91,7 @@ class Env:
     def step(self, action):
         """ Controllers for left/right wheels which are separate """
         # Normalize velocities
-        [left_wheel, right_wheel] = INTERPRETER[action]
+        [left_wheel, right_wheel] = action
         left_wheel = left_wheel*VELOCITY_COEFFICIENT
         right_wheel = right_wheel*VELOCITY_COEFFICIENT
         # Step
@@ -113,11 +112,20 @@ class PyEnv(py_environment.PyEnvironment):
         # Parameters
         self.image_shape = image_shape
         self.input_shape = self.image_shape + (3,)
-        self._num_of_obstacles = 0
-        self._max_steps = 500
+        self._num_of_obstacles = 15
+        # Actions
+        self._num_values = 5
+        self._values = np.linspace(-1, 1, self._num_values)
+        self._actions = np.transpose([
+            np.tile(self._values, self._num_values),
+            np.repeat(self._values, self._num_values)
+        ])
+        self._num_actions = len(self._actions)
         # PyEnvironment variables
         self._action_spec = array_spec.BoundedArraySpec(
-            shape=(), dtype=np.int32,  minimum=0, maximum=4, name='action')
+            shape=(), dtype=np.int32,
+            minimum=0, maximum=self._num_actions-1,
+            name='action')
         self._observation_spec = array_spec.BoundedArraySpec(
             shape=self.input_shape, dtype=np.float32,
             minimum=0, maximum=1, name='observation')
@@ -151,23 +159,17 @@ class PyEnv(py_environment.PyEnvironment):
         _pose = rel_position[0:2]
         return _pose.astype(dtype=np.float32)
 
-    def _normalized_distance_to_destination(self):
+    def _is_finished(self):
         """ Compute the distance from agent to destination """
         position, _ = self._env.getBasePositionAndOrientation()
         position = np.array(position[0:2], dtype=np.float32)
         distance = np.linalg.norm(position-self._env.destination)
-        origin = np.linalg.norm(np.zeros([2])-self._env.destination)
-        return min(distance/origin, 1)
+        return distance < 0.5
 
     def _is_fatal(self):
-        """ Compute whether there are collisions or not """
+        """ Predict a fall """
         position, orientation = self._env.getBasePositionAndOrientation()
         position = np.array(position, dtype=np.float32)
-        collision = self._env.getContactPoints()
-        for contact in collision:
-            # Contact with things different from floor
-            if contact[2] != 0:
-                return True
         # Ohmni felt out of the environment
         if abs(position[2]) >= 0.5:
             return True
@@ -176,20 +178,28 @@ class PyEnv(py_environment.PyEnvironment):
             return True
         return False
 
+    def _is_collided(self):
+        """ Predict collisions """
+        collision = self._env.getContactPoints()
+        for contact in collision:
+            # Contact with things different from floor
+            if contact[2] != 0:
+                return True
+        return False
+
     def _compute_reward(self):
         """ Compute reward and return (<stopped>, <reward>) """
-        normalized_distance = self._normalized_distance_to_destination()
-        # Ohmni reach the destination
-        if normalized_distance < 0.1:
+        # Reaching the destination
+        if self._is_finished():
             return True, 1
-        # If exceed the limitation of steps, return rewards
-        if self._num_steps >= self._max_steps:
-            return True, -1
-        # Stop if detecting collisions or a fall
+        # Dead
         if self._is_fatal():
             return True, -1
+        # Colliding
+        if self._is_collided():
+            return False, -1
         # Ohmni on his way
-        return False, 0
+        return False, -0.01
 
     def _reset(self):
         """ Reset environment"""
@@ -244,7 +254,7 @@ class PyEnv(py_environment.PyEnvironment):
             return self.reset()
         self._num_steps += 1
         # Step the environment
-        self._env.step(action)
+        self._env.step(self._actions[action])
         done, reward = self._compute_reward()
         # Compute and save states
         self.set_state()
