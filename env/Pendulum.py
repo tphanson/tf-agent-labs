@@ -95,7 +95,7 @@ class PyEnv(py_environment.PyEnvironment):
 
         drawed_img = np.copy(img)
         drawed_img = cv.resize(drawed_img, (512, 512))
-        cv.imshow('CartPole-v1', drawed_img)
+        cv.imshow('Pendulum-v0', drawed_img)
         cv.waitKey(10)
 
         return img
