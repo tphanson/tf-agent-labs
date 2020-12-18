@@ -57,7 +57,7 @@ class Env:
         # Add gravity
         p.setGravity(0, 0, -10, physicsClientId=self.clientId)
         # Add plane and ohmni
-        floor(self.clientId, texture=False, wall=False)
+        floor(self.clientId, texture=False, wall=True)
         ohmniId, _capture_image = ohmni(self.clientId)
         # Add obstacles at random positions
         for _ in range(self.num_of_obstacles):
