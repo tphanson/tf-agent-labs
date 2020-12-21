@@ -129,7 +129,7 @@ class PyEnv(py_environment.PyEnvironment):
             name='action')
         self._observation_spec = array_spec.BoundedArraySpec(
             shape=self.input_shape, dtype=np.float32,
-            minimum=[-10, -10, -1], maximum=[10, 10, 1], name='observation')
+            minimum=[-20, -20, 0], maximum=[20, 20, 500], name='observation')
         # Init bullet server
         self._env = Env(
             gui,
@@ -256,7 +256,7 @@ class PyEnv(py_environment.PyEnvironment):
         # self._state = self._state[:, :, 1:]
         # self._state = np.append(self._state, observation, axis=2)
         self._state = np.squeeze(
-            np.array(np.append(pose, cosine_sim), dtype=np.float32))
+            np.array(np.append(pose, self._num_steps), dtype=np.float32))
 
     def _step(self, action):
         """ Step, action is velocities of left/right wheel """
