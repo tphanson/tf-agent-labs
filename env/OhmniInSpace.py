@@ -130,7 +130,7 @@ class PyEnv(py_environment.PyEnvironment):
             name='action')
         self._observation_spec = array_spec.BoundedArraySpec(
             shape=self.input_shape, dtype=np.float32,
-            minimum=[-20, -20], maximum=[20, 20], name='observation')
+            minimum=0, maximum=1, name='observation')
         # Init bullet server
         self._env = Env(
             gui,
