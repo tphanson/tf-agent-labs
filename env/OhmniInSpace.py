@@ -112,7 +112,7 @@ class PyEnv(py_environment.PyEnvironment):
         # Parameters
         self.image_shape = image_shape
         # self.input_shape = self.image_shape + (3,)
-        self.input_shape = (3,)
+        self.input_shape = (2,)
         self._num_of_obstacles = 0
         # Actions
         self._num_values = 5
@@ -129,7 +129,7 @@ class PyEnv(py_environment.PyEnvironment):
             name='action')
         self._observation_spec = array_spec.BoundedArraySpec(
             shape=self.input_shape, dtype=np.float32,
-            minimum=[-20, -20, 0], maximum=[20, 20, 500], name='observation')
+            minimum=[-20, -20], maximum=[20, 20], name='observation')
         # Init bullet server
         self._env = Env(
             gui,
@@ -204,7 +204,7 @@ class PyEnv(py_environment.PyEnvironment):
             return True, -1
         # Colliding
         if self._is_collided():
-            return False, -1
+            return False, -0.5
         # Ohmni on his way
         return False, -0.1
 
@@ -255,8 +255,7 @@ class PyEnv(py_environment.PyEnvironment):
         #     self._state = np.array(init_state, dtype=np.float32)
         # self._state = self._state[:, :, 1:]
         # self._state = np.append(self._state, observation, axis=2)
-        self._state = np.squeeze(
-            np.array(np.append(pose, self._num_steps), dtype=np.float32))
+        self._state = np.squeeze(np.array(pose, dtype=np.float32))
 
     def _step(self, action):
         """ Step, action is velocities of left/right wheel """
