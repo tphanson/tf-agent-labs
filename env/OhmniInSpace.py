@@ -233,16 +233,16 @@ class PyEnv(py_environment.PyEnvironment):
         # Gamifying
         (h, w) = self.image_shape
         _, mask = self._get_image_state()  # Image state
-        self._img = mask
         pose, cosine_sim = self._get_pose_state()  # Pose state
-        # cent = np.array([w/2, h/2], dtype=np.float32)
-        # dest = -pose*1000 + cent  # Transpose/Scale/Tranform
-        # mask = cv.line(mask,
-        #                (int(cent[1]), int(cent[0])),
-        #                (int(dest[1]), int(dest[0])),
-        #                (0, 1, 0), thickness=2)
-        # observation = cv.cvtColor(mask, cv.COLOR_RGB2GRAY)
-        # observation = np.reshape(observation, self.image_shape+(1,))
+        cent = np.array([w/2, h/2], dtype=np.float32)
+        dest = -pose*1000 + cent  # Transpose/Scale/Tranform
+        mask = cv.line(mask,
+                       (int(cent[1]), int(cent[0])),
+                       (int(dest[1]), int(dest[0])),
+                       (0, 1, 0), thickness=2)
+        observation = cv.cvtColor(mask, cv.COLOR_RGB2GRAY)
+        observation = np.reshape(observation, self.image_shape+(1,))
+        self._img = observation
         # # Set state
         # if self._state is None:
         #     init_state = observation
@@ -252,7 +252,8 @@ class PyEnv(py_environment.PyEnvironment):
         #     self._state = np.array(init_state, dtype=np.float32)
         # self._state = self._state[:, :, 1:]
         # self._state = np.append(self._state, observation, axis=2)
-        self._state = np.array(np.append(pose, cosine_sim), dtype=np.float32)
+        self._state = np.squeeze(
+            np.array(np.append(pose, cosine_sim), dtype=np.float32))
 
     def _step(self, action):
         """ Step, action is velocities of left/right wheel """
