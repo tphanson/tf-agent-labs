@@ -174,6 +174,9 @@ class PyEnv(py_environment.PyEnvironment):
         """ Predict a fall """
         position, orientation = self._env.getBasePositionAndOrientation()
         position = np.array(position, dtype=np.float32)
+        # Ohmni exceeds the number of steps
+        if self._num_steps > 500:
+            return True
         # Ohmni felt out of the environment
         if abs(position[2]) >= 0.5:
             return True
