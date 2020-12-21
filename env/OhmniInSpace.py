@@ -42,7 +42,9 @@ class Env:
         return clientId
 
     def _randomize_destination(self):
-        destination = (np.random.rand(2)*15-10).astype(dtype=np.float32)
+        distance = 3
+        destination = (np.random.rand(2)*distance -
+                       distance/2).astype(dtype=np.float32)
         p.addUserDebugLine(
             np.append(destination, 0.),  # From
             np.append(destination, 3.),  # To
@@ -198,7 +200,8 @@ class PyEnv(py_environment.PyEnvironment):
         """ Compute reward and return (<stopped>, <reward>) """
         # Reaching the destination
         if self._is_finished():
-            return True, 1
+            _, cosine_sim = self._get_pose_state()
+            return True, 1+cosine_sim
         # Dead
         if self._is_fatal():
             return True, -1
