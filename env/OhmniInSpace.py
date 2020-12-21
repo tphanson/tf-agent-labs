@@ -56,7 +56,7 @@ class Env:
     def _build(self):
         """ Including floor, ohmni, obstacles into the environment """
         # Add gravity
-        p.setGravity(0, 0, -10, physicsClientId=self.clientId)
+        p.setGravity(0, 0, -20, physicsClientId=self.clientId)
         # Add plane and ohmni
         floor(self.clientId, texture=False, wall=True)
         ohmniId, _capture_image = ohmni(self.clientId)
@@ -113,8 +113,7 @@ class PyEnv(py_environment.PyEnvironment):
         super(PyEnv, self).__init__()
         # Parameters
         self.image_shape = image_shape
-        # self.input_shape = self.image_shape + (3,)
-        self.input_shape = (2,)
+        self.input_shape = self.image_shape + (3,)
         self._num_of_obstacles = 0
         # Actions
         self._num_values = 5
@@ -142,7 +141,6 @@ class PyEnv(py_environment.PyEnvironment):
         self._state = None
         self._episode_ended = False
         self._num_steps = 0
-        self._img = None
         # Reset
         self._reset()
 
@@ -217,7 +215,6 @@ class PyEnv(py_environment.PyEnvironment):
         self._state = None
         self._episode_ended = False
         self._num_steps = 0
-        self._img = None
         self.set_state()
         return ts.restart(self._state)
 
@@ -239,7 +236,7 @@ class PyEnv(py_environment.PyEnvironment):
         # Gamifying
         (h, w) = self.image_shape
         _, mask = self._get_image_state()  # Image state
-        pose, cosine_sim = self._get_pose_state()  # Pose state
+        pose, _ = self._get_pose_state()  # Pose state
         cent = np.array([w/2, h/2], dtype=np.float32)
         dest = -pose*1000 + cent  # Transpose/Scale/Tranform
         mask = cv.line(mask,
@@ -248,17 +245,15 @@ class PyEnv(py_environment.PyEnvironment):
                        (0, 1, 0), thickness=2)
         observation = cv.cvtColor(mask, cv.COLOR_RGB2GRAY)
         observation = np.reshape(observation, self.image_shape+(1,))
-        self._img = observation
-        # # Set state
-        # if self._state is None:
-        #     init_state = observation
-        #     (_, _, stack_channel) = self.input_shape
-        #     for _ in range(stack_channel-1):
-        #         init_state = np.append(init_state, observation, axis=2)
-        #     self._state = np.array(init_state, dtype=np.float32)
-        # self._state = self._state[:, :, 1:]
-        # self._state = np.append(self._state, observation, axis=2)
-        self._state = np.squeeze(np.array(pose, dtype=np.float32))
+        # Set state
+        if self._state is None:
+            init_state = observation
+            (_, _, stack_channel) = self.input_shape
+            for _ in range(stack_channel-1):
+                init_state = np.append(init_state, observation, axis=2)
+            self._state = np.array(init_state, dtype=np.float32)
+        self._state = self._state[:, :, 1:]
+        self._state = np.append(self._state, observation, axis=2)
 
     def _step(self, action):
         """ Step, action is velocities of left/right wheel """
@@ -280,8 +275,7 @@ class PyEnv(py_environment.PyEnvironment):
 
     def render(self, mode='rgb_array'):
         """ Show video stream from navigation camera """
-        # img = self.get_state()
-        img = self._img
+        img = self.get_state()
 
         drawed_img = np.copy(img)
         drawed_img = cv.cvtColor(drawed_img, cv.COLOR_RGB2BGR)
