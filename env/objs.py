@@ -3,20 +3,16 @@ import numpy as np
 import random
 
 
-def plane(clientId):
-    return p.loadURDF('plane.urdf', physicsClientId=clientId)
-
-
-def floor(clientId, texture=False, wall=False):
-    floorId = p.loadURDF('env/model/floor.urdf', physicsClientId=clientId)
+def plane(clientId, texture=False, wall=False):
+    planeId = p.loadURDF('plane.urdf', physicsClientId=clientId)
     if texture:
         textureId = p.loadTexture(
             'env/model/texture/wood1.jpg', physicsClientId=clientId)
         p.changeVisualShape(
-            floorId, -1, textureUniqueId=textureId, physicsClientId=clientId)
+            planeId, -1, textureUniqueId=textureId, physicsClientId=clientId)
     if wall:
         p.loadURDF('samurai.urdf', physicsClientId=clientId)
-    return floorId
+    return planeId
 
 
 def obstacle(clientId, pos=None, dynamic=False):
@@ -26,7 +22,7 @@ def obstacle(clientId, pos=None, dynamic=False):
     dynamic_obstacles = ['cube_rotate.urdf']
     obstacles = dynamic_obstacles if dynamic else static_obstacles
     if pos is None:
-        pos = [random.randint(-9, 9), random.randint(-9, 9), 0.5]
+        pos = [random.randint(-10, 10), random.randint(-10, 10), 0.5]
     return p.loadURDF(random.choice(obstacles), pos, physicsClientId=clientId)
 
 

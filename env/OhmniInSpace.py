@@ -9,7 +9,7 @@ from tf_agents.environments import tf_py_environment
 from tf_agents.specs import array_spec
 from tf_agents.trajectories import time_step as ts
 
-from env.objs import floor, ohmni, obstacle
+from env.objs import plane, ohmni, obstacle
 
 VELOCITY_COEFFICIENT = 10
 
@@ -54,11 +54,11 @@ class Env:
         return destination
 
     def _build(self):
-        """ Including floor, ohmni, obstacles into the environment """
+        """ Including plane, ohmni, obstacles into the environment """
         # Add gravity
         p.setGravity(0, 0, -20, physicsClientId=self.clientId)
         # Add plane and ohmni
-        floor(self.clientId, texture=False, wall=True)
+        plane(self.clientId, texture=False, wall=False)
         ohmniId, _capture_image = ohmni(self.clientId)
         # Add obstacles at random positions
         for _ in range(self.num_of_obstacles):
