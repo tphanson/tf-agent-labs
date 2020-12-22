@@ -1,3 +1,5 @@
+import math
+from random import random
 import pybullet as p
 import pybullet_data
 import numpy as np
@@ -16,14 +18,18 @@ VELOCITY_COEFFICIENT = 10
 
 class Env:
     def __init__(self, gui=False, num_of_obstacles=20, dst_rad=3, image_shape=(96, 96)):
+        # Env constants
         self.gui = gui
         self.timestep = 0.05
-        self.num_of_obstacles = num_of_obstacles
-        self.dst_rad = dst_rad
-        self.image_shape = image_shape
-        self.clientId = self._init_ws()
         self._left_wheel_id = 0
         self._right_wheel_id = 1
+        # Env specs
+        self.image_shape = image_shape
+        self.num_of_obstacles = num_of_obstacles
+        self.dst_rad = dst_rad
+        self.destination = np.array([3, 0], dtype=np.float32)
+        # Init
+        self.clientId = self._init_ws()
 
     def _init_ws(self):
         """
@@ -43,8 +49,11 @@ class Env:
         return clientId
 
     def _randomize_destination(self):
-        destination = (np.random.rand(2)*self.dst_rad -
-                       self.dst_rad/2).astype(dtype=np.float32)
+        x = random()*self.dst_rad
+        x_signed = -1 if random() > 0.5 else 1
+        y = math.sqrt(self.dst_rad**2 - x**2)
+        y_signed = -1 if random() > 0.5 else 1
+        destination = np.array([x*x_signed, y*y_signed], dtype=np.float32)
         p.addUserDebugLine(
             np.append(destination, 0.),  # From
             np.append(destination, 3.),  # To
