@@ -15,10 +15,11 @@ VELOCITY_COEFFICIENT = 10
 
 
 class Env:
-    def __init__(self, gui=False, num_of_obstacles=4, image_shape=(96, 96)):
+    def __init__(self, gui=False, num_of_obstacles=20, dst_rad=3, image_shape=(96, 96)):
         self.gui = gui
         self.timestep = 0.05
         self.num_of_obstacles = num_of_obstacles
+        self.dst_rad = dst_rad
         self.image_shape = image_shape
         self.clientId = self._init_ws()
         self._left_wheel_id = 0
@@ -42,9 +43,8 @@ class Env:
         return clientId
 
     def _randomize_destination(self):
-        distance = 3
-        destination = (np.random.rand(2)*distance -
-                       distance/2).astype(dtype=np.float32)
+        destination = (np.random.rand(2)*self.dst_rad -
+                       self.dst_rad/2).astype(dtype=np.float32)
         p.addUserDebugLine(
             np.append(destination, 0.),  # From
             np.append(destination, 3.),  # To
@@ -114,7 +114,8 @@ class PyEnv(py_environment.PyEnvironment):
         # Parameters
         self.image_shape = image_shape
         self.input_shape = self.image_shape + (3,)
-        self._num_of_obstacles = 0
+        self._num_of_obstacles = 20
+        self._dst_rad = 3
         # Actions
         self._num_values = 5
         self._values = np.linspace(-1, 1, self._num_values)
@@ -135,6 +136,7 @@ class PyEnv(py_environment.PyEnvironment):
         self._env = Env(
             gui,
             num_of_obstacles=self._num_of_obstacles,
+            dst_rad=self._dst_rad,
             image_shape=self.image_shape
         )
         # Internal states
@@ -272,6 +274,10 @@ class PyEnv(py_environment.PyEnvironment):
             return ts.termination(self._state, reward)
         else:
             return ts.transition(self._state, reward)
+
+    def build_challenge(self, num_of_obstacles, dst_rad):
+        """ Increase/Decrease the environment difficulty """
+        pass
 
     def render(self, mode='rgb_array'):
         """ Show video stream from navigation camera """
