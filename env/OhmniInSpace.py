@@ -208,8 +208,8 @@ class PyEnv(py_environment.PyEnvironment):
     def _compute_reward(self):
         """ Compute reward and return (<stopped>, <reward>) """
         # Reaching the destination
+        _, cosine_sim = self._get_pose_state()
         if self._is_finished():
-            _, cosine_sim = self._get_pose_state()
             return True, 1+cosine_sim
         # Dead
         if self._is_fatal():
@@ -218,7 +218,7 @@ class PyEnv(py_environment.PyEnvironment):
         if self._is_collided():
             return False, -0.5
         # Ohmni on his way
-        return False, -0.1
+        return False, -0.1+cosine_sim/10
 
     def _reset(self):
         """ Reset environment"""
