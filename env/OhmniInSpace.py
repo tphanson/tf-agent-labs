@@ -124,7 +124,7 @@ class PyEnv(py_environment.PyEnvironment):
         self.image_shape = image_shape
         self.input_shape = self.image_shape + (3,)
         self._num_of_obstacles = 0
-        self._dst_rad = 2
+        self._dst_rad = 1
         # Actions
         self._num_values = 5
         self._values = np.linspace(-1, 1, self._num_values)
@@ -249,7 +249,7 @@ class PyEnv(py_environment.PyEnvironment):
         _, mask = self._get_image_state()  # Image state
         pose, _ = self._get_pose_state()  # Pose state
         cent = np.array([w/2, h/2], dtype=np.float32)
-        dest = -pose*1000 + cent  # Transpose/Scale/Tranform
+        dest = -pose*64 + cent  # Transpose/Scale/Tranform
         mask = cv.line(mask,
                        (int(cent[1]), int(cent[0])),
                        (int(dest[1]), int(dest[0])),
