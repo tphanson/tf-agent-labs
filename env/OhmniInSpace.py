@@ -51,7 +51,7 @@ class Env:
     def _randomize_destination(self):
         x = random()*self.dst_rad
         x_signed = -1 if random() > 0.5 else 1
-        y = math.sqrt(self.dst_rad**2 - x**2)
+        y = random()*self.dst_rad
         y_signed = -1 if random() > 0.5 else 1
         destination = np.array([x*x_signed, y*y_signed], dtype=np.float32)
         p.addUserDebugLine(
@@ -124,7 +124,7 @@ class PyEnv(py_environment.PyEnvironment):
         self.image_shape = image_shape
         self.input_shape = self.image_shape + (3,)
         self._num_of_obstacles = 0
-        self._dst_rad = 1
+        self._dst_rad = 3
         # Actions
         self._num_values = 5
         self._values = np.linspace(-1, 1, self._num_values)
