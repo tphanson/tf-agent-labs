@@ -31,13 +31,13 @@ class DQN():
         # Agent
         self.global_step = tf.compat.v1.train.get_or_create_global_step()
         self.optimizer = tf.compat.v1.train.AdamOptimizer(
-            learning_rate=0.000005) # 0.000001
+            learning_rate=0.00001) # 0.000001
         self.agent = dqn.dqn_agent.DqnAgent(
             self.env.time_step_spec(),
             self.env.action_spec(),
             q_network=self.q_net,
             optimizer=self.optimizer,
-            td_errors_loss_fn=common.element_wise_squared_loss,
+            td_errors_loss_fn=common.element_wise_huber_loss,
             train_step_counter=self.global_step)
         self.agent.initialize()
         # Checkpoint
