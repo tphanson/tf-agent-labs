@@ -158,9 +158,12 @@ class PyEnv(py_environment.PyEnvironment):
     def _get_image_state(self):
         _, _, rgb_img, _, seg_img = self._env.capture_image()
         img = np.array(rgb_img, dtype=np.float32)/255
-        # We add 0.1 to fix the problem of black pixels which vanish all the parameters
-        fix_vanish_hyperparam = 0.1
-        mask = np.minimum(seg_img+fix_vanish_hyperparam, 1, dtype=np.float32)
+        # We add a constant to fix the problem of black pixels which vanish all the parameters
+        fix_vanish_hyperparam = 0.15
+        mask = np.minimum(
+            seg_img+fix_vanish_hyperparam,
+            1-fix_vanish_hyperparam,
+            dtype=np.float32)
         mask = cv.cvtColor(mask, cv.COLOR_GRAY2RGB)
         return img, mask
 
@@ -255,7 +258,7 @@ class PyEnv(py_environment.PyEnvironment):
         mask = cv.line(mask,
                        (int(cent[1]), int(cent[0])),
                        (int(dest[1]), int(dest[0])),
-                       (0, 1, 0), thickness=2)
+                       (0, 1, 0), thickness=3)
         observation = cv.cvtColor(mask, cv.COLOR_RGB2GRAY)
         observation = np.reshape(observation, self.image_shape+(1,))
         # Set state
