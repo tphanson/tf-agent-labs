@@ -123,6 +123,7 @@ class PyEnv(py_environment.PyEnvironment):
         # Parameters
         self.image_shape = image_shape
         self.input_shape = self.image_shape + (3,)
+        self._fix_vanish_hyperparam = 0.15
         self._num_of_obstacles = 0
         self._dst_rad = 3
         # Actions
@@ -159,10 +160,9 @@ class PyEnv(py_environment.PyEnvironment):
         _, _, rgb_img, _, seg_img = self._env.capture_image()
         img = np.array(rgb_img, dtype=np.float32)/255
         # We add a constant to fix the problem of black pixels which vanish all the parameters
-        fix_vanish_hyperparam = 0.15
         mask = np.minimum(
-            seg_img+fix_vanish_hyperparam,
-            1-fix_vanish_hyperparam,
+            seg_img+self._fix_vanish_hyperparam,
+            1-self._fix_vanish_hyperparam,
             dtype=np.float32)
         mask = cv.cvtColor(mask, cv.COLOR_GRAY2RGB)
         return img, mask
