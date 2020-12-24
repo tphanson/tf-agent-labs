@@ -8,7 +8,7 @@ class ReplayBuffer:
     def __init__(self, data_spec, batch_size=1):
         self.data_spec = data_spec
         self.batch_size = batch_size
-        self.replay_buffer_capacity = 100000
+        self.replay_buffer_capacity = 100
         self.buffer = tf_uniform_replay_buffer.TFUniformReplayBuffer(
             data_spec=self.data_spec,
             batch_size=self.batch_size,
@@ -40,9 +40,10 @@ class ReplayBuffer:
         batch = tf.squeeze(self.sub_buffer.gather_all().observation)
         batch_observation = tf.tile(
             traj.observation, [len(batch), 1, 1, 1])
-        min_distance = tf.reduce_min(tf.reduce_sum(
-            tf.square(batch_observation-batch), axis=[-3, -2, -1]))
-        threshold = 100
+        min_distance = tf.reduce_min(tf.sqrt(tf.reduce_sum(
+            tf.square(batch_observation-batch), axis=[-3, -2, -1])))
+        # print(min_distance)
+        threshold = 7
         if min_distance > threshold:
             return False
         else:
