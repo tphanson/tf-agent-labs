@@ -70,6 +70,9 @@ while step <= num_iterations:
         # Reset
         start = time.time()
         loss = 0
+        # Stop condition
+        if avg_return > 700:
+            break
 
 # Visualization
 criterion.save()
