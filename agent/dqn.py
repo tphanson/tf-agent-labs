@@ -12,13 +12,13 @@ class DQN():
         # Policy
         self.preprocessing_layers = keras.Sequential([  # (96, 96, *)
             keras.layers.Conv2D(  # (92, 92, 16)
-                filters=16, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
+                filters=32, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
             keras.layers.MaxPooling2D((2, 2)),  # (46, 46, 16)
             keras.layers.Conv2D(  # (42, 42, 32)
-                filters=32, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
+                filters=64, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
             keras.layers.MaxPooling2D((2, 2)),  # (21, 21, 32)
             keras.layers.Conv2D(  # (10, 10, 64)
-                filters=64, kernel_size=(3, 3), strides=(2, 2), activation='relu'),
+                filters=128, kernel_size=(3, 3), strides=(2, 2), activation='relu'),
             keras.layers.MaxPooling2D((2, 2)),  # (5, 5, 64)
             keras.layers.Flatten(),
             keras.layers.Dense(1024, activation='relu'),
@@ -31,7 +31,7 @@ class DQN():
         # Agent
         self.global_step = tf.compat.v1.train.get_or_create_global_step()
         self.optimizer = tf.compat.v1.train.AdamOptimizer(
-            learning_rate=0.00005) # 0.000001
+            learning_rate=0.0001) # 0.000001
         self.agent = dqn.dqn_agent.DqnAgent(
             self.env.time_step_spec(),
             self.env.action_spec(),
