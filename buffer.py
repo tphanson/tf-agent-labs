@@ -8,7 +8,7 @@ class ReplayBuffer:
     def __init__(self, data_spec, batch_size=1):
         self.data_spec = data_spec
         self.batch_size = batch_size
-        self.replay_buffer_capacity = 100000
+        self.replay_buffer_capacity = 1000
         self.buffer = tf_uniform_replay_buffer.TFUniformReplayBuffer(
             data_spec=self.data_spec,
             batch_size=self.batch_size,
@@ -33,8 +33,8 @@ class ReplayBuffer:
         ).prefetch(3)
 
     def _filtering(self, traj):
-        # cv.imshow('OhmniInSpace-v0', traj.observation.numpy()[0])
-        # cv.waitKey(10)
+        cv.imshow('OhmniInSpace-v0', traj.observation.numpy()[0])
+        cv.waitKey(10)
         if self.sub_buffer.num_frames() < 2:
             return False
         batch = tf.squeeze(self.sub_buffer.gather_all().observation)
@@ -42,8 +42,7 @@ class ReplayBuffer:
             traj.observation, [len(batch), 1, 1, 1])
         min_distance = tf.reduce_min(tf.sqrt(tf.reduce_sum(
             tf.square(batch_observation-batch), axis=[-3, -2, -1])))
-        # print(min_distance)
-        threshold = 7
+        threshold = 4
         if min_distance > threshold:
             return False
         else:
