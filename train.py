@@ -62,7 +62,8 @@ while step <= num_iterations:
         # Checkpoints
         dqn.save_checkpoint()
         # Evaluation
-        avg_return = criterion.eval(eval_env, dqn.agent.policy, num_episodes=3)
+        # avg_return = criterion.eval(eval_env, dqn.agent.policy, num_episodes=3)
+        avg_return = 0
         print('Step = {0}: Average Return = {1} / Average Loss = {2}'.format(
             step, avg_return, loss/eval_step))
         end = time.time()

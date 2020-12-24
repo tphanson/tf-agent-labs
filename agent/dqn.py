@@ -11,15 +11,15 @@ class DQN():
         self.env = env
         # Policy
         self.preprocessing_layers = keras.Sequential([  # (96, 96, *)
-            keras.layers.Conv2D(  # (92, 92, 16)
+            keras.layers.Conv2D(  # (92, 92, 32)
                 filters=32, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
-            keras.layers.MaxPooling2D((2, 2)),  # (46, 46, 16)
-            keras.layers.Conv2D(  # (42, 42, 32)
+            keras.layers.MaxPooling2D((2, 2)),  # (46, 46, 32)
+            keras.layers.Conv2D(  # (42, 42, 64)
                 filters=64, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
-            keras.layers.MaxPooling2D((2, 2)),  # (21, 21, 32)
-            keras.layers.Conv2D(  # (10, 10, 64)
+            keras.layers.MaxPooling2D((2, 2)),  # (21, 21, 64)
+            keras.layers.Conv2D(  # (10, 10, 128)
                 filters=128, kernel_size=(3, 3), strides=(2, 2), activation='relu'),
-            keras.layers.MaxPooling2D((2, 2)),  # (5, 5, 64)
+            keras.layers.MaxPooling2D((2, 2)),  # (5, 5, 128)
             keras.layers.Flatten(),
             keras.layers.Dense(1024, activation='relu'),
         ])
