@@ -34,7 +34,7 @@ dqn.agent.train = common.function(dqn.agent.train)
 criterion = ExpectedReturn()
 
 # Replay buffer
-initial_collect_steps = 1000
+initial_collect_steps = 10000
 replay_buffer = ReplayBuffer(
     dqn.agent.collect_data_spec,
     batch_size=train_env.batch_size,
@@ -45,8 +45,8 @@ dataset = replay_buffer.as_dataset()
 iterator = iter(dataset)
 
 # Train
-num_iterations = 20000
-eval_step = 1
+num_iterations = 200000
+eval_step = 1000
 start = time.time()
 loss = 0
 step = dqn.agent.train_step_counter.numpy()
@@ -62,8 +62,7 @@ while step <= num_iterations:
         # Checkpoints
         dqn.save_checkpoint()
         # Evaluation
-        # avg_return = criterion.eval(eval_env, dqn.agent.policy, num_episodes=3)
-        avg_return = 0
+        avg_return = criterion.eval(eval_env, dqn.agent.policy, num_episodes=3)
         print('Step = {0}: Average Return = {1} / Average Loss = {2}'.format(
             step, avg_return, loss/eval_step))
         end = time.time()
@@ -71,9 +70,6 @@ while step <= num_iterations:
         # Reset
         start = time.time()
         loss = 0
-        # Stop condition
-        if avg_return > 700:
-            break
 
 # Visualization
 criterion.save()
