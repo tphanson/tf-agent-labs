@@ -46,7 +46,7 @@ iterator = iter(dataset)
 
 # Train
 num_iterations = 200000
-eval_step = 1000
+eval_step = 1
 start = time.time()
 loss = 0
 step = dqn.agent.train_step_counter.numpy()
