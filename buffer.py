@@ -12,7 +12,9 @@ class ReplayBuffer:
         self.buffer = tf_uniform_replay_buffer.TFUniformReplayBuffer(
             data_spec=self.data_spec,
             batch_size=self.batch_size,
-            max_length=self.replay_buffer_capacity)
+            max_length=self.replay_buffer_capacity,
+            device='gpu:*',
+        )
         # For Experience Filtering (EF)
         # self.sub_buffer = tf_uniform_replay_buffer.TFUniformReplayBuffer(
         #     data_spec=self.data_spec,
