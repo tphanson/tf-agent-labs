@@ -21,7 +21,7 @@ class DQN():
                 filters=64, kernel_size=(3, 3), strides=(2, 2), activation='relu'),
             keras.layers.MaxPooling2D((2, 2)),  # (5, 5, 64)
             keras.layers.Flatten(),
-            keras.layers.Dense(512, activation='relu'),
+            keras.layers.Dense(768, activation='relu'),
         ])
         self.q_net = q_network.QNetwork(
             self.env.observation_spec(),
