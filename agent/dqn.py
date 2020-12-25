@@ -5,6 +5,8 @@ from tf_agents.networks import q_network
 from tf_agents.utils import common
 from tf_agents.experimental.train.utils import strategy_utils
 
+GPU = len(tf.config.list_physical_devices('GPU')) > 0
+
 
 class DQN():
     def __init__(self, env, checkpoint_dir):
@@ -13,7 +15,7 @@ class DQN():
         self.global_step = tf.compat.v1.train.get_or_create_global_step()
         self.optimizer = tf.compat.v1.train.AdamOptimizer(
             learning_rate=0.00001)  # 0.000001
-        with strategy_utils.get_strategy(tpu=False, use_gpu=True).scope():
+        with strategy_utils.get_strategy(tpu=False, use_gpu=GPU).scope():
             # Policy
             self.preprocessing_layers = keras.Sequential([  # (96, 96, *)
                 keras.layers.Conv2D(  # (92, 92, *)
