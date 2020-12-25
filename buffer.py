@@ -60,5 +60,3 @@ class ReplayBuffer:
     def collect_steps(self, env, policy, steps=1):
         for _ in range(steps):
             traj = self.collect(env, policy)
-            if traj.is_boundary():
-                self.sub_buffer.clear()

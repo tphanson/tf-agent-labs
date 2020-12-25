@@ -122,7 +122,7 @@ class PyEnv(py_environment.PyEnvironment):
         # Parameters
         self.image_shape = image_shape
         self.input_shape = self.image_shape + (3,)
-        self._fix_vanish_hyperparam = 0.15
+        self._fix_vanish_hyperparam = 0
         self._num_of_obstacles = 0
         self._dst_rad = 3
         # Actions
