@@ -11,7 +11,6 @@ class ReplayBuffer:
             data_spec=self.data_spec,
             batch_size=self.batch_size,
             max_length=self.replay_buffer_capacity,
-            device='gpu:*',
         )
     def __len__(self):
         return self.buffer.num_frames()
