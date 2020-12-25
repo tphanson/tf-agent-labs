@@ -3,43 +3,45 @@ from tensorflow import keras
 from tf_agents.agents import dqn
 from tf_agents.networks import q_network
 from tf_agents.utils import common
+from tf_agents.experimental.train.utils import strategy_utils
 
 
 class DQN():
     def __init__(self, env, checkpoint_dir):
         # Env
         self.env = env
-        # Policy
-        self.preprocessing_layers = keras.Sequential([  # (96, 96, *)
-            keras.layers.Conv2D(  # (92, 92, *)
-                filters=32, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
-            keras.layers.MaxPooling2D((2, 2)),  # (46, 46, *)
-            keras.layers.Conv2D(  # (42, 42, 32)
-                filters=64, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
-            keras.layers.MaxPooling2D((2, 2)),  # (21, 21, *)
-            keras.layers.Conv2D(  # (10, 10, *)
-                filters=128, kernel_size=(3, 3), strides=(2, 2), activation='relu'),
-            keras.layers.MaxPooling2D((2, 2)),  # (5, 5, *)
-            keras.layers.Flatten(),
-            keras.layers.Dense(768, activation='relu'),
-        ])
-        self.q_net = q_network.QNetwork(
-            self.env.observation_spec(),
-            self.env.action_spec(),
-            preprocessing_layers=self.preprocessing_layers,
-            fc_layer_params=(512, 256))
-            # Agent
         self.global_step = tf.compat.v1.train.get_or_create_global_step()
         self.optimizer = tf.compat.v1.train.AdamOptimizer(
             learning_rate=0.00001)  # 0.000001
-        self.agent = dqn.dqn_agent.DqnAgent(
-            self.env.time_step_spec(),
-            self.env.action_spec(),
-            q_network=self.q_net,
-            optimizer=self.optimizer,
-            td_errors_loss_fn=common.element_wise_squared_loss,
-            train_step_counter=self.global_step)
-        self.agent.initialize()
+        with strategy_utils.get_strategy(tpu=False, use_gpu=True).scope():
+            # Policy
+            self.preprocessing_layers = keras.Sequential([  # (96, 96, *)
+                keras.layers.Conv2D(  # (92, 92, *)
+                    filters=32, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
+                keras.layers.MaxPooling2D((2, 2)),  # (46, 46, *)
+                keras.layers.Conv2D(  # (42, 42, 32)
+                    filters=64, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
+                keras.layers.MaxPooling2D((2, 2)),  # (21, 21, *)
+                keras.layers.Conv2D(  # (10, 10, *)
+                    filters=128, kernel_size=(3, 3), strides=(2, 2), activation='relu'),
+                keras.layers.MaxPooling2D((2, 2)),  # (5, 5, *)
+                keras.layers.Flatten(),
+                keras.layers.Dense(768, activation='relu'),
+            ])
+            self.q_net = q_network.QNetwork(
+                self.env.observation_spec(),
+                self.env.action_spec(),
+                preprocessing_layers=self.preprocessing_layers,
+                fc_layer_params=(512, 256))
+            # Agent
+            self.agent = dqn.dqn_agent.DqnAgent(
+                self.env.time_step_spec(),
+                self.env.action_spec(),
+                q_network=self.q_net,
+                optimizer=self.optimizer,
+                td_errors_loss_fn=common.element_wise_squared_loss,
+                train_step_counter=self.global_step)
+            self.agent.initialize()
         # Checkpoint
         self.checkpoint_dir = checkpoint_dir
         self.checkpointer = common.Checkpointer(
