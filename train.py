@@ -34,7 +34,7 @@ dqn.agent.train = common.function(dqn.agent.train)
 criterion = ExpectedReturn()
 
 # Replay buffer
-initial_collect_steps = 10000
+initial_collect_steps = 1000
 replay_buffer = ReplayBuffer(
     dqn.agent.collect_data_spec,
     batch_size=train_env.batch_size,
