@@ -12,7 +12,7 @@ class ExpectedReturn:
             time_step = tfenv.reset()
             steps = self.max_steps
             episode_return = 0.0
-            while not time_step.is_boundary():
+            while not time_step.is_last():
                 steps -= 1
                 action_step = agent.action(time_step)
                 time_step = tfenv.step(action_step.action)
