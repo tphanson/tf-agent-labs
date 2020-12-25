@@ -35,6 +35,8 @@ class ReplayBuffer:
     def _filtering(self, traj):
         # cv.imshow('OhmniInSpace-v0', traj.observation.numpy()[0])
         # cv.waitKey(10)
+        if traj.is_boundary():
+            self.sub_buffer.clear()
         if self.sub_buffer.num_frames() < 2:
             return False
         batch = tf.squeeze(self.sub_buffer.gather_all().observation)
@@ -49,6 +51,7 @@ class ReplayBuffer:
 
     def collect(self, env, policy):
         while True:
+            print(self.buffer.num_frames())
             time_step = env.current_time_step()
             action_step = policy.action(time_step)
             next_time_step = env.step(action_step.action)
@@ -62,5 +65,3 @@ class ReplayBuffer:
     def collect_steps(self, env, policy, steps=1):
         for _ in range(steps):
             traj = self.collect(env, policy)
-            if traj.is_boundary():
-                self.sub_buffer.clear()
