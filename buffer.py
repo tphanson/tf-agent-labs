@@ -42,9 +42,7 @@ class ReplayBuffer:
             traj.observation, [len(batch), 1, 1, 1])
         min_distance = tf.reduce_min(tf.sqrt(tf.reduce_sum(
             tf.square(batch_observation-batch), axis=[-3, -2, -1])))
-        threshold = 10
-        print(min_distance)
-        if min_distance > threshold:
+        if min_distance > 10:
             return False
         else:
             return True
