@@ -123,7 +123,7 @@ class PyEnv(py_environment.PyEnvironment):
         self.image_shape = image_shape
         self.input_shape = self.image_shape + (3,)
         self._fix_vanish_hyperparam = 0.15
-        self._num_of_obstacles = 0
+        self._num_of_obstacles = 20
         self._dst_rad = 3
         # Actions
         self._num_values = 5
@@ -141,8 +141,8 @@ class PyEnv(py_environment.PyEnvironment):
             name='action')
         self._observation_spec = array_spec.BoundedArraySpec(
             shape=self.input_shape, dtype=np.float32,
-            minimum=self._fix_vanish_hyperparam,
-            maximum=1-self._fix_vanish_hyperparam,
+            minimum=0,
+            maximum=1,
             name='observation')
         # Init bullet server
         self._env = Env(
@@ -225,7 +225,7 @@ class PyEnv(py_environment.PyEnvironment):
         if self._is_collided():
             return False, -0.5
         # Ohmni on his way
-        return False, -0.1+cosine_sim/10
+        return False, -0.1
 
     def _reset(self):
         """ Reset environment"""
