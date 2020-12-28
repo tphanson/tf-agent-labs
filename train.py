@@ -6,7 +6,7 @@ from tf_agents.utils import common
 from env import OhmniInSpace
 from agent.dqn import DQN
 from buffer import ReplayBuffer
-from eval import ExpectedReturn
+from crit import ExpectedReturn
 
 # Compulsory config for tf_agents
 tf.compat.v1.enable_v2_behavior()
