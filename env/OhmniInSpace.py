@@ -291,10 +291,6 @@ class PyEnv(py_environment.PyEnvironment):
         else:
             return ts.transition(self._state, reward)
 
-    def build_challenge(self, num_of_obstacles, dst_rad):
-        """ Increase/Decrease the environment difficulty """
-        pass
-
     def render(self, mode='rgb_array'):
         """ Show video stream from navigation camera """
         img = self.get_state()

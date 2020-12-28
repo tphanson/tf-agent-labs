@@ -2,6 +2,7 @@ import os
 import time
 import tensorflow as tf
 from tf_agents.utils import common
+from tf_agents.policies import random_tf_policy
 
 from env import OhmniInSpace
 from agent.dqn import DQN
@@ -29,6 +30,7 @@ eval_env = OhmniInSpace.env()
 # Agent
 dqn = DQN(train_env, CHECKPOINT_DIR)
 dqn.agent.train = common.function(dqn.agent.train)
+step = dqn.agent.train_step_counter.numpy()
 
 # Metrics and Evaluation
 ER = ExpectedReturn()
@@ -39,8 +41,14 @@ replay_buffer = ReplayBuffer(
     dqn.agent.collect_data_spec,
     batch_size=train_env.batch_size,
 )
+# Init buffer
+random_policy = random_tf_policy.RandomTFPolicy(
+    train_env.time_step_spec(),
+    train_env.action_spec())
 for _ in range(initial_collect_steps):
-    replay_buffer.collect_steps(train_env, dqn.agent.collect_policy)
+    if LOCAL:
+        train_env.render()
+    replay_buffer.collect_steps(train_env, random_policy)
 dataset = replay_buffer.as_dataset()
 iterator = iter(dataset)
 
@@ -49,7 +57,6 @@ num_iterations = 200000
 eval_step = 1000
 start = time.time()
 loss = 0
-step = dqn.agent.train_step_counter.numpy()
 while step <= num_iterations:
     if LOCAL:
         train_env.render()

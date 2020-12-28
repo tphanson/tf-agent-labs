@@ -20,7 +20,6 @@ class ReplayBuffer:
 
     def as_dataset(self, sample_batch_size=32):
         return self.buffer.as_dataset(
-            num_parallel_calls=3,
             sample_batch_size=sample_batch_size,
             num_steps=2
         ).prefetch(3)
