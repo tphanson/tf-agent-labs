@@ -5,8 +5,8 @@ from tf_agents.utils import common
 
 from env import OhmniInSpace
 from agent.dqn import DQN
-from buffer import ReplayBuffer
-from crit import ExpectedReturn
+from buffer import Reverb as ReplayBuffer
+from criterion import ExpectedReturn
 
 # Compulsory config for tf_agents
 tf.compat.v1.enable_v2_behavior()
@@ -22,7 +22,6 @@ POLICY_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               './models/checkpoints')
 
-with tf.device('/device:GPU:1'):
 # Environment
 train_env = OhmniInSpace.env()
 eval_env = OhmniInSpace.env()
@@ -32,7 +31,7 @@ dqn = DQN(train_env, CHECKPOINT_DIR)
 dqn.agent.train = common.function(dqn.agent.train)
 
 # Metrics and Evaluation
-criterion = ExpectedReturn()
+ER = ExpectedReturn()
 
 # Replay buffer
 initial_collect_steps = 1000
@@ -63,7 +62,7 @@ while step <= num_iterations:
         # Checkpoints
         dqn.save_checkpoint()
         # Evaluation
-        avg_return = criterion.eval(eval_env, dqn.agent.policy, num_episodes=3)
+        avg_return = ER.eval(eval_env, dqn.agent.policy, num_episodes=3)
         print('Step = {0}: Average Return = {1} / Average Loss = {2}'.format(
             step, avg_return, loss/eval_step))
         end = time.time()
@@ -73,4 +72,4 @@ while step <= num_iterations:
         loss = 0
 
 # Visualization
-criterion.save()
+ER.save()
