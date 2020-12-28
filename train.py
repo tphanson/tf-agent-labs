@@ -5,7 +5,7 @@ from tf_agents.utils import common
 
 from env import OhmniInSpace
 from agent.dqn import DQN
-from buffer import Reverb as ReplayBuffer
+from buffer import ReplayBuffer
 from criterion import ExpectedReturn
 
 # Compulsory config for tf_agents
