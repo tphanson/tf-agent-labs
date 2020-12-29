@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
-from tf_agents.agents import dqn
-from tf_agents.networks import q_network
+from tf_agents.agents import categorical_dqn
+from tf_agents.networks import categorical_q_network
 from tf_agents.utils import common
 from tf_agents.experimental.train.utils import strategy_utils
 
@@ -30,17 +30,21 @@ class DQN():
                 keras.layers.Flatten(),
                 keras.layers.Dense(768, activation='relu'),
             ])
-            self.q_net = q_network.QNetwork(
+            self.q_net = categorical_q_network.CategoricalQNetwork(
                 self.env.observation_spec(),
                 self.env.action_spec(),
+                num_atoms=51,
                 preprocessing_layers=self.preprocessing_layers,
                 fc_layer_params=(512, 256))
             # Agent
-            self.agent = dqn.dqn_agent.DqnAgent(
+            self.agent = categorical_dqn.categorical_dqn_agent.CategoricalDqnAgent(
                 self.env.time_step_spec(),
                 self.env.action_spec(),
-                q_network=self.q_net,
+                categorical_q_network=self.q_net,
                 optimizer=self.optimizer,
+                min_q_value=-1.1,
+                max_q_value=1.1,
+                n_step_update=2,
                 td_errors_loss_fn=common.element_wise_squared_loss,
                 train_step_counter=self.global_step)
             self.agent.initialize()
