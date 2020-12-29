@@ -15,13 +15,16 @@ class ExpectedReturn:
             action_step = agent.action(time_step)
             time_step = tfenv.step(action_step.action)
             episode_return += time_step.reward.numpy()[0]
+            print(1, episode_return)
         episode_return += time_step.reward*steps  # Amplify the return
+        print(2, episode_return)
         return episode_return
 
     def eval_multiple_episodes(self, tfenv, agent, num_episodes):
         total_returns = 0.0
         for _ in range(num_episodes):
             total_returns += self.eval_single_episode(tfenv, agent)
+            print(3, total_returns)
         avg_return = total_returns / num_episodes
         return avg_return
 
