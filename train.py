@@ -25,6 +25,7 @@ CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 
 # Environment
 train_env = OhmniInSpace.env()
+eval_env = OhmniInSpace.env()
 
 # Agent
 dqn = DQN(train_env, CHECKPOINT_DIR)
@@ -35,7 +36,7 @@ step = dqn.agent.train_step_counter.numpy()
 ER = ExpectedReturn()
 
 # Replay buffer
-initial_collect_steps = 100
+initial_collect_steps = 2000
 replay_buffer = ReplayBuffer(
     dqn.agent.collect_data_spec,
     batch_size=train_env.batch_size,
@@ -68,7 +69,7 @@ while step <= num_iterations:
         # Checkpoints
         dqn.save_checkpoint()
         # Evaluation
-        avg_return = ER.eval(OhmniInSpace.env, dqn.agent.policy, num_episodes=3)
+        avg_return = ER.eval(eval_env, dqn.agent.policy, num_episodes=3)
         print('Step = {0}: Average Return = {1} / Average Loss = {2}'.format(
             step, avg_return, loss/eval_step))
         end = time.time()
