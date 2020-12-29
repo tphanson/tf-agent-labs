@@ -33,7 +33,7 @@ step = dqn.agent.train_step_counter.numpy()
 ER = ExpectedReturn()
 
 # Replay buffer
-initial_collect_steps = 20
+initial_collect_steps = 2000
 replay_buffer = ReplayBuffer(
     dqn.agent.collect_data_spec,
     batch_size=train_env.batch_size,
@@ -51,7 +51,7 @@ iterator = iter(dataset)
 
 # Train
 num_iterations = 1000000
-eval_step = 10
+eval_step = 1000
 start = time.time()
 loss = 0
 while step <= num_iterations:
