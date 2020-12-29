@@ -3,7 +3,6 @@ from multiprocessing import Pool
 
 
 def eval_single_episode(max_steps, tfenv, agent):
-    tfenv = gen_tfenv_func()
     time_step = tfenv.reset()
     steps = max_steps
     episode_return = 0.0
