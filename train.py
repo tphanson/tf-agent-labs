@@ -66,7 +66,7 @@ while step <= num_iterations:
         # Checkpoints
         dqn.save_checkpoint()
         # Evaluation
-        avg_return = ER.eval(num_episodes=5)
+        avg_return = ER.eval()
         print('Step = {0}: Average Return = {1} / Average Loss = {2}'.format(
             step, avg_return, loss/eval_step))
         end = time.time()
