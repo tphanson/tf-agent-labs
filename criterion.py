@@ -2,26 +2,26 @@ import matplotlib.pyplot as plt
 from multiprocessing import Pool
 
 
+def eval_single_episode(max_steps, tfenv, agent):
+    tfenv = gen_tfenv_func()
+    time_step = tfenv.reset()
+    steps = max_steps
+    episode_return = 0.0
+    while not time_step.is_last():
+        steps -= 1
+        action_step = agent.action(time_step)
+        time_step = tfenv.step(action_step.action)
+        episode_return += time_step.reward
+    episode_return += time_step.reward*steps  # Amplify the return
+    return episode_return.numpy()[0]
+
+
 class ExpectedReturn:
     def __init__(self):
         self.returns = None
         self.max_steps = 500
 
     def eval_multiple_episodes(self, gen_tfenv_func, agent, num_episodes):
-
-        def eval_single_episode(max_steps, tfenv, agent):
-            tfenv = gen_tfenv_func()
-            time_step = tfenv.reset()
-            steps = max_steps
-            episode_return = 0.0
-            while not time_step.is_last():
-                steps -= 1
-                action_step = agent.action(time_step)
-                time_step = tfenv.step(action_step.action)
-                episode_return += time_step.reward
-            episode_return += time_step.reward*steps  # Amplify the return
-            return episode_return.numpy()[0]
-
         pool = Pool()
         args = []
         for _ in range(num_episodes):
