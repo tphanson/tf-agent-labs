@@ -3,6 +3,7 @@ from multiprocessing import Pool
 
 
 def eval_single_episode(max_steps, tfenv, agent):
+    tfenv = gen_tfenv_func()
     time_step = tfenv.reset()
     steps = max_steps
     episode_return = 0.0
@@ -10,9 +11,9 @@ def eval_single_episode(max_steps, tfenv, agent):
         steps -= 1
         action_step = agent.action(time_step)
         time_step = tfenv.step(action_step.action)
-        episode_return += time_step.reward
+        episode_return += time_step.reward.numpy()[0]
     episode_return += time_step.reward*steps  # Amplify the return
-    return episode_return.numpy()[0]
+    return episode_return
 
 
 class ExpectedReturn:
@@ -24,8 +25,7 @@ class ExpectedReturn:
         pool = Pool()
         args = []
         for _ in range(num_episodes):
-            tfenv = gen_tfenv_func()
-            args.append((self.max_steps, tfenv, agent))
+            args.append((self.max_steps, gen_tfenv_func, agent))
         print(args)
         episode_returns = pool.map(eval_single_episode, args)
         print(episode_returns)
