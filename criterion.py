@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from multiprocessing import Pool
 
 
-def eval_single_episode(max_steps, tfenv, agent):
+def eval_single_episode(max_steps, gen_tfenv_func, agent):
     tfenv = gen_tfenv_func()
     time_step = tfenv.reset()
     steps = max_steps
