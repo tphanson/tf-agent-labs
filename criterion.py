@@ -5,7 +5,7 @@ class ExpectedReturn:
     def __init__(self):
         self.returns = None
         self.max_steps = 500
-    
+
     def eval_single_episode(self, tfenv, agent):
         time_step = tfenv.reset()
         steps = self.max_steps
@@ -25,9 +25,8 @@ class ExpectedReturn:
         avg_return = total_returns / num_episodes
         return avg_return
 
-    def eval(self, gen_tfenv_func, agent, num_episodes=5):
-        avg_return = self.eval_multiple_episodes(
-            gen_tfenv_func, agent, num_episodes)
+    def eval(self, tfenv, agent, num_episodes=5):
+        avg_return = self.eval_multiple_episodes(tfenv, agent, num_episodes)
         if self.returns is None:
             self.returns = [avg_return]
         else:
