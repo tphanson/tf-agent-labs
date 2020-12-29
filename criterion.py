@@ -26,6 +26,7 @@ class ExpectedReturn:
         args = []
         for _ in range(num_episodes):
             args.append((self.max_steps, gen_tfenv_func, agent))
+        print(args)
         episode_returns = pool.map(eval_single_episode, args)
         print(episode_returns)
         avg_return = sum(episode_returns) / num_episodes
