@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from multiprocessing import Pool
 
 
 class ExpectedReturn:
@@ -6,24 +7,31 @@ class ExpectedReturn:
         self.returns = None
         self.max_steps = 500
 
-    def compute_avg_return(self, tfenv, agent, num_episodes):
-        total_return = 0.0
-        for _ in range(num_episodes):
+    def eval_multiple_episodes(self, gen_tfenv_func, agent, num_episodes):
+
+        def eval_single_episode(max_steps, gen_tfenv_func, agent):
+            tfenv = gen_tfenv_func()
             time_step = tfenv.reset()
-            steps = self.max_steps
+            steps = max_steps
             episode_return = 0.0
             while not time_step.is_last():
                 steps -= 1
                 action_step = agent.action(time_step)
                 time_step = tfenv.step(action_step.action)
                 episode_return += time_step.reward
-            episode_return += time_step.reward*steps # Amplify the return
-            total_return += episode_return
-        avg_return = total_return / num_episodes
-        return avg_return.numpy()[0]
+            episode_return += time_step.reward*steps  # Amplify the return
+            return episode_return.numpy()[0]
+
+        pool = Pool()
+        args = []
+        for _ in range(num_episodes):
+            args.append((self.max_steps, gen_tfenv_func, agent))
+        episode_returns = pool.map(eval_single_episode, args)
+        avg_return = sum(episode_returns) / num_episodes
+        return avg_return
 
     def eval(self, tfenv, agent, num_episodes=5):
-        avg_return = self.compute_avg_return(tfenv, agent, num_episodes)
+        avg_return = self.eval_multiple_episodes(tfenv, agent, num_episodes)
         if self.returns is None:
             self.returns = [avg_return]
         else:
