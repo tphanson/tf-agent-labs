@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from multiprocessing import Pool
 
 
 class ExpectedReturn:
