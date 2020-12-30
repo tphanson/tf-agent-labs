@@ -51,7 +51,8 @@ class ExpectedReturn:
         episode_returns = ray.get(futures)
         avg_return = sum(episode_returns) / num_episodes
         # Release memory
-        ray.kill(actors)
+        for actor in actors:
+            ray.kill(actor)
         del futures
         return avg_return
 
