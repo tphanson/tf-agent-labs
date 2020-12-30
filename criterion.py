@@ -27,6 +27,8 @@ def eval_single_episode(max_steps):
         time_step = tfenv.step(action_step.action)
         episode_return += time_step.reward
     episode_return += time_step.reward*steps  # Amplify the return
+
+    tfenv.close()
     return episode_return.numpy()[0]
 
 

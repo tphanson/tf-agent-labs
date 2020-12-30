@@ -28,7 +28,7 @@ class Env:
         self.dst_rad = dst_rad
         self.destination = np.array([3, 0], dtype=np.float32)
         # Init
-        self.clientId = self._init_ws()
+        self.client_id = self._init_ws()
 
     def _init_ws(self):
         """
@@ -39,13 +39,13 @@ class Env:
             for ai/ml/rl development.
         """
         # Init server
-        clientId = p.connect(p.GUI if self.gui else p.DIRECT)
+        client_id = p.connect(p.GUI if self.gui else p.DIRECT)
         p.setAdditionalSearchPath(
-            pybullet_data.getDataPath(), physicsClientId=clientId)
-        p.setTimeStep(self.timestep, physicsClientId=clientId)
+            pybullet_data.getDataPath(), physicsClientId=client_id)
+        p.setTimeStep(self.timestep, physicsClientId=client_id)
         p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
         # Return
-        return clientId
+        return client_id
 
     def _randomize_destination(self):
         x = random()*self.dst_rad
@@ -57,27 +57,27 @@ class Env:
             np.append(destination, 0.),  # From
             np.append(destination, 3.),  # To
             [1, 0, 0],  # Red
-            physicsClientId=self.clientId
+            physicsClientId=self.client_id
         )
         return destination
 
     def _build(self):
         """ Including plane, ohmni, obstacles into the environment """
         # Add gravity
-        p.setGravity(0, 0, -20, physicsClientId=self.clientId)
+        p.setGravity(0, 0, -20, physicsClientId=self.client_id)
         # Add plane and ohmni
-        plane(self.clientId, texture=False, wall=False)
-        ohmniId, _capture_image = ohmni(self.clientId)
+        plane(self.client_id, texture=False, wall=False)
+        ohmni_id, _capture_image = ohmni(self.client_id)
         # Add obstacles at random positions
         for _ in range(self.num_of_obstacles):
-            obstacle(self.clientId)
+            obstacle(self.client_id)
         # Return
-        return ohmniId, _capture_image
+        return ohmni_id, _capture_image
 
     def _reset(self):
         """ Remove all objects, then rebuild them """
-        p.resetSimulation(physicsClientId=self.clientId)
-        self.ohmniId, self._capture_image = self._build()
+        p.resetSimulation(physicsClientId=self.client_id)
+        self.ohmni_id, self._capture_image = self._build()
         self.destination = self._randomize_destination()
 
     def capture_image(self):
@@ -88,11 +88,11 @@ class Env:
 
     def getContactPoints(self):
         """ Get Ohmni contacts """
-        return p.getContactPoints(self.ohmniId, physicsClientId=self.clientId)
+        return p.getContactPoints(self.ohmni_id, physicsClientId=self.client_id)
 
     def getBasePositionAndOrientation(self):
         """ Get Ohmni position and orientation """
-        return p.getBasePositionAndOrientation(self.ohmniId, physicsClientId=self.clientId)
+        return p.getBasePositionAndOrientation(self.ohmni_id, physicsClientId=self.client_id)
 
     def reset(self):
         """ Reset the environment """
@@ -105,15 +105,18 @@ class Env:
         left_wheel = left_wheel*VELOCITY_COEFFICIENT
         right_wheel = right_wheel*VELOCITY_COEFFICIENT
         # Step
-        p.setJointMotorControl2(self.ohmniId, self._left_wheel_id,
+        p.setJointMotorControl2(self.ohmni_id, self._left_wheel_id,
                                 p.VELOCITY_CONTROL,
                                 targetVelocity=left_wheel,
-                                physicsClientId=self.clientId)
-        p.setJointMotorControl2(self.ohmniId, self._right_wheel_id,
+                                physicsClientId=self.client_id)
+        p.setJointMotorControl2(self.ohmni_id, self._right_wheel_id,
                                 p.VELOCITY_CONTROL,
                                 targetVelocity=right_wheel,
-                                physicsClientId=self.clientId)
-        p.stepSimulation(physicsClientId=self.clientId)
+                                physicsClientId=self.client_id)
+        p.stepSimulation(physicsClientId=self.client_id)
+
+    def close(self):
+        return p.disconnect(physicsClientId=self.client_id)
 
 
 class PyEnv(py_environment.PyEnvironment):
@@ -302,6 +305,9 @@ class PyEnv(py_environment.PyEnvironment):
         cv.waitKey(10)
 
         return img
+
+    def close(self):
+        return self._env.close()
 
 
 def env(gui=False):
