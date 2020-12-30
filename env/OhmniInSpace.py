@@ -115,9 +115,6 @@ class Env:
                                 physicsClientId=self.client_id)
         p.stepSimulation(physicsClientId=self.client_id)
 
-    def close(self):
-        return p.disconnect(physicsClientId=self.client_id)
-
 
 class PyEnv(py_environment.PyEnvironment):
     def __init__(self, gui=False, image_shape=(96, 96)):
@@ -305,9 +302,6 @@ class PyEnv(py_environment.PyEnvironment):
         cv.waitKey(10)
 
         return img
-
-    def close(self):
-        return self._env.close()
 
 
 def env(gui=False):
