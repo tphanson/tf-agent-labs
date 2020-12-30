@@ -8,8 +8,6 @@ from agent.dqn import DQN
 tf.compat.v1.enable_v2_behavior()
 
 # Saving dir
-POLICY_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                          './models/policy')
 CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               './models/checkpoints')
 

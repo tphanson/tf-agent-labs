@@ -9,7 +9,7 @@ from env import OhmniInSpace
 ray.init()
 
 
-@ray.remote
+@ray.remote(memory=5 * 1024 * 1024 * 1024)
 def eval_single_episode(max_steps):
     # Init env & agent
     tfenv = OhmniInSpace.env()
