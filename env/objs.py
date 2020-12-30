@@ -1,6 +1,6 @@
 import pybullet as p
 import numpy as np
-import random
+from random import random, choice
 
 
 def plane(clientId, texture=False, wall=False):
@@ -21,9 +21,15 @@ def obstacle(clientId, pos=None, dynamic=False):
                         'sphere2.urdf']
     dynamic_obstacles = ['cube_rotate.urdf']
     obstacles = dynamic_obstacles if dynamic else static_obstacles
+    zone_rad = 6 # Dropping zone
+    safe_rad = 1 # Ohmni's position
     if pos is None:
-        pos = [random.randint(-10, 10), random.randint(-10, 10), 0.5]
-    return p.loadURDF(random.choice(obstacles), pos, physicsClientId=clientId)
+        x = max(random()*zone_rad, safe_rad)
+        x_signed = -1 if random() > 0.5 else 1
+        y = max(random()*zone_rad, safe_rad)
+        y_signed = -1 if random() > 0.5 else 1
+        pos = [x*x_signed, y*y_signed, 0.5]
+    return p.loadURDF(choice(obstacles), pos, physicsClientId=clientId)
 
 
 def ohmni(clientId):

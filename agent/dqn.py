@@ -14,7 +14,7 @@ class DQN():
         self.env = env
         self.global_step = tf.compat.v1.train.get_or_create_global_step()
         self.optimizer = tf.compat.v1.train.AdamOptimizer(
-            learning_rate=0.00001)  # 0.000001
+            learning_rate=0.0001)
         with strategy_utils.get_strategy(tpu=False, use_gpu=GPU).scope():
             # Policy
             self.preprocessing_layers = keras.Sequential([  # (96, 96, *)
@@ -42,8 +42,8 @@ class DQN():
                 self.env.action_spec(),
                 categorical_q_network=self.q_net,
                 optimizer=self.optimizer,
-                min_q_value=-1.1,
-                max_q_value=1.1,
+                min_q_value=-6,
+                max_q_value=0,
                 n_step_update=2,
                 td_errors_loss_fn=common.element_wise_squared_loss,
                 train_step_counter=self.global_step)
