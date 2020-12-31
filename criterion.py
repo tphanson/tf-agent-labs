@@ -1,5 +1,6 @@
 
 import os
+import logging
 import matplotlib.pyplot as plt
 import ray
 from tf_agents.utils import common
@@ -11,9 +12,13 @@ ray.init()
 ONE_GIGABYTES = 1024 * 1024 * 1024
 
 
-@ray.remote(memory=2*ONE_GIGABYTES)
+@ray.remote(memory=2*ONE_GIGABYTES, num_cpus=2, num_gpus=1)
 class EvalActor(object):
     def __init__(self, max_steps):
+
+        # Config logging
+        logging.basicConfig(level=logging.ERROR)
+
         self.max_steps = max_steps
         self.env = OhmniInSpace.env()
         self.checkpoint = os.path.join(os.path.dirname(os.path.abspath(__file__)),
