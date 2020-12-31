@@ -1,4 +1,3 @@
-import math
 from random import random
 import pybullet as p
 import pybullet_data
@@ -51,7 +50,7 @@ class Env:
     def _randomize_destination(self):
         x = random()*self.dst_rad
         x_signed = -1 if random() > 0.5 else 1
-        y = math.sqrt(self.dst_rad**2-x**2)
+        y = random()*self.dst_rad
         y_signed = -1 if random() > 0.5 else 1
         destination = np.array([x*x_signed, y*y_signed], dtype=np.float32)
         p.addUserDebugLine(
