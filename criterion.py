@@ -11,7 +11,7 @@ ray.init()
 ONE_GIGABYTES = 1024 * 1024 * 1024
 
 
-@ray.remote(memory=2*ONE_GIGABYTES, num_cpus=2)
+@ray.remote(memory=2*ONE_GIGABYTES)
 class EvalActor(object):
     def __init__(self, max_steps):
         self.max_steps = max_steps
