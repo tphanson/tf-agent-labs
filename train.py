@@ -49,9 +49,9 @@ dataset = replay_buffer.as_dataset()
 iterator = iter(dataset)
 
 # Train
-num_iterations = 100000
+num_iterations = 5000000
 eval_step = 1000
-promote_step = 10000
+promote_step = 20000
 start = time.time()
 loss = 0
 while step <= num_iterations:
@@ -62,7 +62,7 @@ while step <= num_iterations:
     loss += dqn.agent.train(experience).loss
     # Evaluation
     step = dqn.agent.train_step_counter.numpy()
-    difficulty = min(step // promote_step, 0)
+    difficulty = min(step // promote_step, 15)
     if step % promote_step == 0:
         OhmniInSpace.promote_difficulty(train_env, difficulty)
     if step % eval_step == 0:
