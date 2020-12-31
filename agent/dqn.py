@@ -6,7 +6,6 @@ from tf_agents.utils import common
 from tf_agents.experimental.train.utils import strategy_utils
 
 GPU = len(tf.config.list_physical_devices('GPU')) > 0
-tf.get_logger().setLevel('INFO')
 
 
 class DQN():
