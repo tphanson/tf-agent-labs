@@ -12,12 +12,12 @@ ray.init()
 ONE_GIGABYTES = 1024 * 1024 * 1024
 
 
-@ray.remote(memory=2*ONE_GIGABYTES, num_cpus=2, num_gpus=1)
+@ray.remote(memory=2*ONE_GIGABYTES, num_cpus=2)
 class EvalActor(object):
     def __init__(self, max_steps):
 
         # Config logging
-        logging.basicConfig(level=logging.ERROR)
+        logging.disable(level=logging.ERROR)
 
         self.max_steps = max_steps
         self.env = OhmniInSpace.env()
