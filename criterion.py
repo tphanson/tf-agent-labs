@@ -13,9 +13,10 @@ ONE_GIGABYTES = 1024 * 1024 * 1024
 
 @ray.remote(memory=2*ONE_GIGABYTES)
 class EvalActor(object):
-    def __init__(self, max_steps):
+    def __init__(self, max_steps, num_of_obstacles):
         self.max_steps = max_steps
         self.env = OhmniInSpace.env()
+        OhmniInSpace.promote_difficulty(self.env, num_of_obstacles)
         self.checkpoint = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                        './models/checkpoints')
         self.dqn = DQN(self.env, self.checkpoint)
@@ -37,11 +38,10 @@ class EvalActor(object):
 class ExpectedReturn:
     def __init__(self):
         self.returns = None
-        self.max_steps = 500
 
-    def eval_multiple_episodes(self, num_episodes):
+    def eval_multiple_episodes(self, num_episodes, num_of_obstacles):
         actors = [
-            EvalActor.remote(self.max_steps)
+            EvalActor.remote(500, num_of_obstacles)
             for _ in range(num_episodes)
         ]
         futures = [
@@ -56,8 +56,8 @@ class ExpectedReturn:
         del futures
         return avg_return
 
-    def eval(self, num_episodes=5):
-        avg_return = self.eval_multiple_episodes(num_episodes)
+    def eval(self, num_episodes=5, num_of_obstacles=0):
+        avg_return = self.eval_multiple_episodes(num_episodes, num_of_obstacles)
         if self.returns is None:
             self.returns = [avg_return]
         else:

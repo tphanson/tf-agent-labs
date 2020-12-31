@@ -34,7 +34,7 @@ step = dqn.agent.train_step_counter.numpy()
 ER = ExpectedReturn()
 
 # Replay buffer
-initial_collect_steps = 10000
+initial_collect_steps = 2000
 replay_buffer = ReplayBuffer(
     dqn.agent.collect_data_spec,
     batch_size=train_env.batch_size,
@@ -51,6 +51,7 @@ iterator = iter(dataset)
 # Train
 num_iterations = 100000
 eval_step = 1000
+promote_step = 10000
 start = time.time()
 loss = 0
 while step <= num_iterations:
@@ -61,11 +62,14 @@ while step <= num_iterations:
     loss += dqn.agent.train(experience).loss
     # Evaluation
     step = dqn.agent.train_step_counter.numpy()
+    difficulty = min(step//promote_step, 15)
+    if step % promote_step == 0:
+        OhmniInSpace.promote_difficulty(train_env, difficulty)
     if step % eval_step == 0:
         # Checkpoints
         dqn.save_checkpoint()
         # Evaluation
-        avg_return = ER.eval()
+        avg_return = ER.eval(num_of_obstacles=difficulty)
         print('Step = {0}: Average Return = {1} / Average Loss = {2}'.format(
             step, avg_return, loss/eval_step))
         end = time.time()

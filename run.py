@@ -13,6 +13,7 @@ CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 
 # Environment
 env = OhmniInSpace.env(gui=True)
+OhmniInSpace.promote_difficulty(env, 10)
 
 # Agent
 dqn = DQN(env, CHECKPOINT_DIR)

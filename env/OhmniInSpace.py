@@ -310,3 +310,8 @@ def env(gui=False):
     pyenv = PyEnv(gui=gui)
     tfenv = tf_py_environment.TFPyEnvironment(pyenv)
     return tfenv
+
+
+def promote_difficulty(tfenv, num_of_obstacles):
+    for pyenv in tfenv.envs:
+        pyenv._env.num_of_obstacles = num_of_obstacles
