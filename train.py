@@ -1,14 +1,14 @@
-from criterion import ExpectedReturn
-from buffer import ReplayBuffer
-from agent.dqn import DQN
-from env import OhmniInSpace
-from tf_agents.policies import random_tf_policy
-from tf_agents.utils import common
-import tensorflow as tf
-import time
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
+import time
+import tensorflow as tf
+from tf_agents.utils import common
+from tf_agents.policies import random_tf_policy
 
+from env import OhmniInSpace
+from agent.dqn import DQN
+from buffer import ReplayBuffer
+from criterion import ExpectedReturn
 
 # Compulsory config for tf_agents
 tf.compat.v1.enable_v2_behavior()
