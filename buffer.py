@@ -12,6 +12,7 @@ class ReplayBuffer:
             batch_size=self.batch_size,
             max_length=self.replay_buffer_capacity,
         )
+
     def __len__(self):
         return self.buffer.num_frames()
 

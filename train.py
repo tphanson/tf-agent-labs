@@ -1,14 +1,14 @@
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
-import time
-import tensorflow as tf
-from tf_agents.utils import common
-from tf_agents.policies import random_tf_policy
-
-from env import OhmniInSpace
-from agent.dqn import DQN
-from buffer import ReplayBuffer
 from criterion import ExpectedReturn
+from buffer import ReplayBuffer
+from agent.dqn import DQN
+from env import OhmniInSpace
+from tf_agents.policies import random_tf_policy
+from tf_agents.utils import common
+import tensorflow as tf
+import time
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 
 # Compulsory config for tf_agents
 tf.compat.v1.enable_v2_behavior()
@@ -43,10 +43,8 @@ replay_buffer = ReplayBuffer(
 random_policy = random_tf_policy.RandomTFPolicy(
     train_env.time_step_spec(),
     train_env.action_spec())
-for _ in range(initial_collect_steps):
-    if LOCAL:
-        train_env.render()
-    replay_buffer.collect_steps(train_env, random_policy)
+replay_buffer.collect_steps(
+    train_env, random_policy, steps=initial_collect_steps)
 dataset = replay_buffer.as_dataset()
 iterator = iter(dataset)
 
