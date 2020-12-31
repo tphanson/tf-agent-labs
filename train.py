@@ -1,5 +1,5 @@
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import time
 import tensorflow as tf
 from tf_agents.utils import common
@@ -62,7 +62,7 @@ while step <= num_iterations:
     loss += dqn.agent.train(experience).loss
     # Evaluation
     step = dqn.agent.train_step_counter.numpy()
-    difficulty = min(step//promote_step, 15)
+    difficulty = min(step // promote_step, 0)
     if step % promote_step == 0:
         OhmniInSpace.promote_difficulty(train_env, difficulty)
     if step % eval_step == 0:
@@ -71,9 +71,9 @@ while step <= num_iterations:
         # Evaluation
         avg_return = ER.eval(num_of_obstacles=difficulty)
         print('Step = {0}: Average Return = {1} / Average Loss = {2}'.format(
-            step, avg_return, loss/eval_step))
+            step, avg_return, loss / eval_step))
         end = time.time()
-        print('Step estimated time: {:.4f}'.format((end-start)/eval_step))
+        print('Step estimated time: {:.4f}'.format((end - start) / eval_step))
         # Reset
         start = time.time()
         loss = 0
