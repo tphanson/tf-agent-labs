@@ -12,7 +12,7 @@ from tf_agents.trajectories import time_step as ts
 
 from env.objs import plane, ohmni, obstacle
 
-VELOCITY_COEFFICIENT = 10
+VELOCITY_COEFFICIENT = 15
 
 
 class Env:
@@ -64,7 +64,7 @@ class Env:
     def _build(self):
         """ Including plane, ohmni, obstacles into the environment """
         # Add gravity
-        p.setGravity(0, 0, -20, physicsClientId=self.client_id)
+        p.setGravity(0, 0, -10, physicsClientId=self.client_id)
         # Add plane and ohmni
         plane(self.client_id, texture=False, wall=False)
         ohmni_id, _capture_image = ohmni(self.client_id)

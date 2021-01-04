@@ -13,13 +13,16 @@ CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 
 # Environment
 env = OhmniInSpace.env(gui=True)
-OhmniInSpace.promote_difficulty(env, 15)
 
 # Agent
 dqn = DQN(env, CHECKPOINT_DIR)
 dqn.load_checkpoint()
 
 counter = 0
+promote_step = 100000
+step = dqn.agent.train_step_counter.numpy()
+difficulty = min(step // promote_step, 15)
+OhmniInSpace.promote_difficulty(env, difficulty)
 while counter < 10000:
     counter += 1
     time_step = env.current_time_step()

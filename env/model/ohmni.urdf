@@ -85,7 +85,7 @@
 	<link name="caster_link">
 		<inertial>
 			<origin xyz="-0.016859 0 -0.039" rpy="0 0 0" />
-			<mass value="0.12725" />
+			<mass value="5.5" /> <!-- Hack to balance Ohmni. Original mass is 0.12725 -->
 			<inertia ixx="0.00013389" ixy="-3.291E-08" ixz="-5.4328E-05" iyy="0.00016302" iyz="-4.433E-08" izz="9.9804E-05" />
 		</inertial>
 		<visual>
