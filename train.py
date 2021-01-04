@@ -51,7 +51,7 @@ iterator = iter(dataset)
 # Train
 num_iterations = 5000000
 eval_step = 1000
-promote_step = 100000
+promote_step = 50000
 start = time.time()
 loss = 0
 while step <= num_iterations:
