@@ -42,7 +42,7 @@ class DQN():
                 self.env.action_spec(),
                 categorical_q_network=self.q_net,
                 optimizer=self.optimizer,
-                min_q_value=-6,
+                min_q_value=-3,
                 max_q_value=1,
                 n_step_update=2,
                 td_errors_loss_fn=common.element_wise_squared_loss,
