@@ -49,7 +49,7 @@ dataset = replay_buffer.as_dataset()
 iterator = iter(dataset)
 
 # Train
-num_iterations = 5000000
+num_iterations = 1000000
 eval_step = 1000
 promote_step = 100000
 start = time.time()
