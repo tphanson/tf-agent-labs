@@ -48,11 +48,11 @@ class Env:
         return client_id
 
     def _randomize_destination(self):
-        x = random()*self.dst_rad
+        x = random() * self.dst_rad
         x_signed = -1 if random() > 0.5 else 1
-        y = random()*self.dst_rad
+        y = random() * self.dst_rad
         y_signed = -1 if random() > 0.5 else 1
-        destination = np.array([x*x_signed, y*y_signed], dtype=np.float32)
+        destination = np.array([x * x_signed, y * y_signed], dtype=np.float32)
         p.addUserDebugLine(
             np.append(destination, 0.),  # From
             np.append(destination, 3.),  # To
@@ -102,8 +102,8 @@ class Env:
         """ Controllers for left/right wheels which are separate """
         # Normalize velocities
         [left_wheel, right_wheel] = action
-        left_wheel = left_wheel*VELOCITY_COEFFICIENT
-        right_wheel = right_wheel*VELOCITY_COEFFICIENT
+        left_wheel = left_wheel * VELOCITY_COEFFICIENT
+        right_wheel = right_wheel * VELOCITY_COEFFICIENT
         # Step
         p.setJointMotorControl2(self.ohmni_id, self._left_wheel_id,
                                 p.VELOCITY_CONTROL,
@@ -122,10 +122,11 @@ class PyEnv(py_environment.PyEnvironment):
         # Parameters
         self.image_shape = image_shape
         self.input_shape = self.image_shape + (3,)
+        self.vector_shape = (256,)
+        self.max_steps = 300
         self._fix_vanish_hyperparam = 0.15
         self._num_of_obstacles = 0
         self._dst_rad = 3
-        self.max_steps = 300
         # Actions
         self._num_values = 5
         self._values = np.linspace(-1, 1, self._num_values)
@@ -138,13 +139,20 @@ class PyEnv(py_environment.PyEnvironment):
         self._action_spec = array_spec.BoundedArraySpec(
             shape=(), dtype=np.int32,
             minimum=0,
-            maximum=self._num_actions-1,
+            maximum=self._num_actions - 1,
             name='action')
-        self._observation_spec = array_spec.BoundedArraySpec(
-            shape=self.input_shape, dtype=np.float32,
-            minimum=0,
-            maximum=1,
-            name='observation')
+        self._observation_spec = {
+            'image': array_spec.BoundedArraySpec(
+                shape=self.input_shape, dtype=np.float32,
+                minimum=0,
+                maximum=1,
+                name='image'),
+            'vector': array_spec.BoundedArraySpec(
+                shape=self.vector_shape, dtype=np.float32,
+                minimum=0,
+                maximum=1,
+                name='vector')
+        }
         # Init bullet server
         self._env = Env(
             gui,
@@ -161,11 +169,11 @@ class PyEnv(py_environment.PyEnvironment):
 
     def _get_image_state(self):
         _, _, rgb_img, _, seg_img = self._env.capture_image()
-        img = np.array(rgb_img, dtype=np.float32)/255
+        img = np.array(rgb_img, dtype=np.float32) / 255
         # We add a constant to fix the problem of black pixels which vanish all the parameters
         mask = np.minimum(
-            seg_img+self._fix_vanish_hyperparam,
-            1-self._fix_vanish_hyperparam,
+            seg_img + self._fix_vanish_hyperparam,
+            1 - self._fix_vanish_hyperparam,
             dtype=np.float32)
         mask = cv.cvtColor(mask, cv.COLOR_GRAY2RGB)
         return img, mask
@@ -179,14 +187,14 @@ class PyEnv(py_environment.PyEnvironment):
         rel_position = rotation.apply(destination_posistion - position)
         _pose = rel_position[0:2]
         cosine_sim = np.dot([1, 0], _pose) / \
-            (np.linalg.norm([1, 0])*np.linalg.norm(_pose))
+            (np.linalg.norm([1, 0]) * np.linalg.norm(_pose))
         return _pose.astype(dtype=np.float32), cosine_sim
 
     def _is_finished(self):
         """ Compute the distance from agent to destination """
         position, _ = self._env.getBasePositionAndOrientation()
         position = np.array(position[0:2], dtype=np.float32)
-        distance = np.linalg.norm(position-self._env.destination)
+        distance = np.linalg.norm(position - self._env.destination)
         return distance < 0.5
 
     def _is_fatal(self):
@@ -226,7 +234,7 @@ class PyEnv(py_environment.PyEnvironment):
         if self._is_collided():
             return False, -0.2
         # Ohmni on his way
-        return False, -0.1 + cosine_sim/20
+        return False, -0.1 + cosine_sim / 20
 
     def _reset(self):
         """ Reset environment"""
@@ -256,23 +264,26 @@ class PyEnv(py_environment.PyEnvironment):
         (h, w) = self.image_shape
         _, mask = self._get_image_state()  # Image state
         pose, _ = self._get_pose_state()  # Pose state
-        cent = np.array([w/2, h/2], dtype=np.float32)
-        dest = -pose*64 + cent  # Transpose/Scale/Tranform
+        cent = np.array([w / 2, h / 2], dtype=np.float32)
+        dest = -pose * 64 + cent  # Transpose/Scale/Tranform
         mask = cv.line(mask,
                        (int(cent[1]), int(cent[0])),
                        (int(dest[1]), int(dest[0])),
                        (0, 1, 0), thickness=3)
         observation = cv.cvtColor(mask, cv.COLOR_RGB2GRAY)
-        observation = np.reshape(observation, self.image_shape+(1,))
+        observation = np.reshape(observation, self.image_shape + (1,))
         # Set state
         if self._state is None:
             init_state = observation
             (_, _, stack_channel) = self.input_shape
-            for _ in range(stack_channel-1):
+            for _ in range(stack_channel - 1):
                 init_state = np.append(init_state, observation, axis=2)
             self._state = np.array(init_state, dtype=np.float32)
         self._state = self._state[:, :, 1:]
-        self._state = np.append(self._state, observation, axis=2)
+        self._state = {
+            'image': np.append(self._state, observation, axis=2),
+            'vector': np.zeros(self.vector_shape, dtype=np.float32)
+        }
 
     def _step(self, action):
         """ Step, action is velocities of left/right wheel """

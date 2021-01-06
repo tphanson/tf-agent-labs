@@ -57,7 +57,7 @@ loss = 0
 while step <= num_iterations:
     if LOCAL:
         train_env.render()
-    replay_buffer.collect_steps(train_env, dqn.agent.collect_policy)
+    replay_buffer.collect_steps(train_env, dqn.agent.collect_policy, dqn=dqn)
     experience, _ = next(iterator)
     loss += dqn.agent.train(experience).loss
     # Evaluation

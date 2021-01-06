@@ -17,7 +17,7 @@ class DQN():
             learning_rate=0.00001)
         with strategy_utils.get_strategy(tpu=False, use_gpu=GPU).scope():
             # Policy
-            self.preprocessing_layers = keras.Sequential([  # (96, 96, *)
+            conv = keras.Sequential([  # (96, 96, *)
                 keras.layers.Conv2D(  # (92, 92, *)
                     filters=32, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
                 keras.layers.MaxPooling2D((2, 2)),  # (46, 46, *)
@@ -30,11 +30,17 @@ class DQN():
                 keras.layers.Flatten(),
                 keras.layers.Dense(768, activation='relu'),
             ])
+            accum = keras.Sequential([
+                keras.layers.Dense(768, activation='relu'),
+                keras.layers.Dense(768, activation='relu'),
+            ])
+            combiner = keras.layers.Concatenate(axis=-1)
             self.q_net = categorical_q_network.CategoricalQNetwork(
                 self.env.observation_spec(),
                 self.env.action_spec(),
                 num_atoms=51,
-                preprocessing_layers=self.preprocessing_layers,
+                preprocessing_layers={'image': conv, 'vector': accum},
+                preprocessing_combiner=combiner,
                 fc_layer_params=(512, 256),
             )
             # Agent
@@ -58,10 +64,11 @@ class DQN():
             policy=self.agent.policy,
             global_step=self.global_step
         )
-        # Debug
-        # encoder = self.q_net.get_layer(index=0).get_layer(index=0)
-        # print(encoder.get_layer(index=-1))
-        # exit(0)
+        # Accumulative layer (infinite-term memory)
+        self.encoder = self.q_net.get_layer(index=0).get_layer(index=0)
+
+    def call_encoder(self, inputs):
+        return self.encoder(inputs)
 
     def save_checkpoint(self):
         self.checkpointer.save(self.global_step)
