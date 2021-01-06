@@ -161,7 +161,7 @@ class PyEnv(py_environment.PyEnvironment):
             image_shape=self.image_shape
         )
         # Internal states
-        self._state = None
+        self._state = {'image': None, 'vector': None}
         self._episode_ended = False
         self._num_steps = 0
         # Reset
@@ -239,7 +239,7 @@ class PyEnv(py_environment.PyEnvironment):
     def _reset(self):
         """ Reset environment"""
         self._env.reset()
-        self._state = None
+        self._state = {'image': None, 'vector': None}
         self._episode_ended = False
         self._num_steps = 0
         self.set_state()
@@ -273,7 +273,7 @@ class PyEnv(py_environment.PyEnvironment):
         observation = cv.cvtColor(mask, cv.COLOR_RGB2GRAY)
         observation = np.reshape(observation, self.image_shape + (1,))
         # Set state
-        if self._state is None:
+        if self._state['image'] is None:
             init_state = observation
             (_, _, stack_channel) = self.input_shape
             for _ in range(stack_channel - 1):
@@ -304,7 +304,7 @@ class PyEnv(py_environment.PyEnvironment):
 
     def render(self, mode='rgb_array'):
         """ Show video stream from navigation camera """
-        img = self.get_state()
+        img = self.get_state()['image']
 
         drawed_img = np.copy(img)
         drawed_img = cv.cvtColor(drawed_img, cv.COLOR_RGB2BGR)
