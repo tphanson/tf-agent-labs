@@ -278,12 +278,11 @@ class PyEnv(py_environment.PyEnvironment):
             (_, _, stack_channel) = self.input_shape
             for _ in range(stack_channel - 1):
                 init_state = np.append(init_state, observation, axis=2)
-            self._state = np.array(init_state, dtype=np.float32)
-        self._state = self._state[:, :, 1:]
-        self._state = {
-            'image': np.append(self._state, observation, axis=2),
-            'vector': np.zeros(self.vector_shape, dtype=np.float32)
-        }
+            self._state['image'] = np.array(init_state, dtype=np.float32)
+        self._state['image'] = self._state['image'][:, :, 1:]
+        self._state['image'] = np.append(
+            self._state['image'], observation, axis=2)
+        self._state['vector'] = np.zeros(self.vector_shape, dtype=np.float32)
 
     def _step(self, action):
         """ Step, action is velocities of left/right wheel """
