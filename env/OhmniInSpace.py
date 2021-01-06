@@ -193,7 +193,7 @@ class PyEnv(py_environment.PyEnvironment):
         position, orientation = self._env.getBasePositionAndOrientation()
         position = np.array(position, dtype=np.float32)
         # Ohmni exceeds the number of steps
-        if self._num_steps > 500:
+        if self._num_steps > 300:
             return True
         # Ohmni felt out of the environment
         if abs(position[2]) >= 0.5:
@@ -225,7 +225,7 @@ class PyEnv(py_environment.PyEnvironment):
         if self._is_collided():
             return False, -0.2
         # Ohmni on his way
-        return False, -0.1 + cosine_sim/100
+        return False, -0.1 + cosine_sim/20
 
     def _reset(self):
         """ Reset environment"""
