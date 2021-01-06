@@ -28,10 +28,7 @@ class ReplayBuffer:
     def collect(self, env, policy, dqn=None):
         time_step = env.current_time_step()
         if dqn is not None:
-            print(time_step)
-            accumulative_vector = dqn.call_encoder(time_step.observation)
-            print(accumulative_vector)
-        action_step = policy.action(time_step)
+            accumulative_vector = dqn.call_encoder(time_step.observation)        action_step = policy.action(time_step)
         next_time_step = env.step(action_step.action)
         traj = trajectory.from_transition(
             time_step, action_step, next_time_step)
