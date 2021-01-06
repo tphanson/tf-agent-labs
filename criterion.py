@@ -13,8 +13,7 @@ ONE_GIGABYTES = 1024 * 1024 * 1024
 
 @ray.remote(memory=2*ONE_GIGABYTES)
 class EvalActor(object):
-    def __init__(self, max_steps, num_of_obstacles):
-        self.max_steps = max_steps
+    def __init__(self, num_of_obstacles):
         self.env = OhmniInSpace.env()
         OhmniInSpace.promote_difficulty(self.env, num_of_obstacles)
         self.checkpoint = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -24,7 +23,7 @@ class EvalActor(object):
 
     def eval(self):
         time_step = self.env.reset()
-        steps = self.max_steps
+        steps = self.env.max_steps
         episode_return = 0.0
         while not time_step.is_last():
             steps -= 1
@@ -41,7 +40,7 @@ class ExpectedReturn:
 
     def eval_multiple_episodes(self, num_episodes, num_of_obstacles):
         actors = [
-            EvalActor.remote(500, num_of_obstacles)
+            EvalActor.remote(num_of_obstacles)
             for _ in range(num_episodes)
         ]
         futures = [

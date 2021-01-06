@@ -125,6 +125,7 @@ class PyEnv(py_environment.PyEnvironment):
         self._fix_vanish_hyperparam = 0.15
         self._num_of_obstacles = 0
         self._dst_rad = 3
+        self.max_steps = 300
         # Actions
         self._num_values = 5
         self._values = np.linspace(-1, 1, self._num_values)
@@ -193,7 +194,7 @@ class PyEnv(py_environment.PyEnvironment):
         position, orientation = self._env.getBasePositionAndOrientation()
         position = np.array(position, dtype=np.float32)
         # Ohmni exceeds the number of steps
-        if self._num_steps > 300:
+        if self._num_steps > self.max_steps:
             return True
         # Ohmni felt out of the environment
         if abs(position[2]) >= 0.5:
