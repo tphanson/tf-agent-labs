@@ -60,7 +60,7 @@ class DQN():
         )
         # Debug
         # encoder = self.q_net.get_layer(index=0).get_layer(index=0)
-        # print(encoder)
+        # print(encoder.get_layer(index=-1))
         # exit(0)
 
     def save_checkpoint(self):

@@ -11,10 +11,13 @@ ray.init()
 ONE_GIGABYTES = 1024 * 1024 * 1024
 
 
-@ray.remote(memory=2*ONE_GIGABYTES)
+@ray.remote(memory=2 * ONE_GIGABYTES)
 class EvalActor(object):
     def __init__(self, num_of_obstacles):
         self.env = OhmniInSpace.env()
+        for pyenv in self.env.envs:
+            self.max_steps = pyenv.max_steps
+            break
         OhmniInSpace.promote_difficulty(self.env, num_of_obstacles)
         self.checkpoint = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                        './models/checkpoints')
@@ -23,14 +26,14 @@ class EvalActor(object):
 
     def eval(self):
         time_step = self.env.reset()
-        steps = self.env.max_steps
+        steps = self.max_steps
         episode_return = 0.0
         while not time_step.is_last():
             steps -= 1
             action_step = self.dqn.agent.policy.action(time_step)
             time_step = self.env.step(action_step.action)
             episode_return += time_step.reward
-        episode_return += time_step.reward*steps
+        episode_return += time_step.reward * steps
         return episode_return.numpy()[0]
 
 
@@ -56,7 +59,8 @@ class ExpectedReturn:
         return avg_return
 
     def eval(self, num_episodes=5, num_of_obstacles=0):
-        avg_return = self.eval_multiple_episodes(num_episodes, num_of_obstacles)
+        avg_return = self.eval_multiple_episodes(
+            num_episodes, num_of_obstacles)
         if self.returns is None:
             self.returns = [avg_return]
         else:
