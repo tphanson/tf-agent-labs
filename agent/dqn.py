@@ -67,7 +67,7 @@ class DQN():
             keras.layers.Flatten(),
             keras.layers.Dense(768, activation='relu'),
         ])
-        y = conv(x)
+        x = conv(x)
         # Feedback layer
         feed = keras.Sequential([
             keras.layers.Dense(768, activation='relu'),
