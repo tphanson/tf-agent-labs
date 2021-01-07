@@ -67,7 +67,7 @@ class DQN():
             keras.layers.Flatten(),
             keras.layers.Dense(768, activation='relu'),
         ])
-        x = conv(x)
+        y = conv(x)
         # Feedback layer
         feed = keras.Sequential([
             keras.layers.Dense(768, activation='relu'),
@@ -77,7 +77,7 @@ class DQN():
         v = feed(zeros)
         # Combiner
         conc = keras.layers.Concatenate()
-        y = conc([x, v])
+        y = conc([y, v])
         # Output layer
         return keras.Model(inputs=x, outputs=y)
 
