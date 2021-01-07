@@ -141,18 +141,11 @@ class PyEnv(py_environment.PyEnvironment):
             minimum=0,
             maximum=self._num_actions - 1,
             name='action')
-        self._observation_spec = {
-            'image': array_spec.BoundedArraySpec(
-                shape=self.input_shape, dtype=np.float32,
-                minimum=0,
-                maximum=1,
-                name='image'),
-            'vector': array_spec.BoundedArraySpec(
-                shape=self.vector_shape, dtype=np.float32,
-                minimum=0,
-                maximum=1,
-                name='vector')
-        }
+        self._observation_spec = array_spec.BoundedArraySpec(
+            shape=self.input_shape, dtype=np.float32,
+            minimum=0,
+            maximum=1,
+            name='observation')
         # Init bullet server
         self._env = Env(
             gui,
@@ -161,7 +154,7 @@ class PyEnv(py_environment.PyEnvironment):
             image_shape=self.image_shape
         )
         # Internal states
-        self._state = {'image': None, 'vector': None}
+        self._state = None
         self._episode_ended = False
         self._num_steps = 0
         # Reset
@@ -239,7 +232,7 @@ class PyEnv(py_environment.PyEnvironment):
     def _reset(self):
         """ Reset environment"""
         self._env.reset()
-        self._state = {'image': None, 'vector': None}
+        self._state = None
         self._episode_ended = False
         self._num_steps = 0
         self.set_state()
@@ -259,7 +252,7 @@ class PyEnv(py_environment.PyEnvironment):
     def get_state(self):
         return self._state
 
-    def set_state(self, _unused=None):
+    def set_state(self, state=None):
         # Gamifying
         (h, w) = self.image_shape
         _, mask = self._get_image_state()  # Image state
@@ -273,16 +266,14 @@ class PyEnv(py_environment.PyEnvironment):
         observation = cv.cvtColor(mask, cv.COLOR_RGB2GRAY)
         observation = np.reshape(observation, self.image_shape + (1,))
         # Set state
-        if self._state['image'] is None:
+        if self._state is None:
             init_state = observation
             (_, _, stack_channel) = self.input_shape
             for _ in range(stack_channel - 1):
                 init_state = np.append(init_state, observation, axis=2)
-            self._state['image'] = np.array(init_state, dtype=np.float32)
-        self._state['image'] = self._state['image'][:, :, 1:]
-        self._state['image'] = np.append(
-            self._state['image'], observation, axis=2)
-        self._state['vector'] = np.zeros(self.vector_shape, dtype=np.float32)
+            self._state = np.array(init_state, dtype=np.float32)
+        self._state = self._state[:, :, 1:]
+        self._state = np.append(self._state, observation, axis=2)
 
     def _step(self, action):
         """ Step, action is velocities of left/right wheel """
@@ -304,7 +295,7 @@ class PyEnv(py_environment.PyEnvironment):
 
     def render(self, mode='rgb_array'):
         """ Show video stream from navigation camera """
-        img = self.get_state()['image']
+        img = self.get_state()
 
         drawed_img = np.copy(img)
         drawed_img = cv.cvtColor(drawed_img, cv.COLOR_RGB2BGR)

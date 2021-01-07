@@ -49,7 +49,7 @@ dataset = replay_buffer.as_dataset()
 iterator = iter(dataset)
 
 # Train
-num_iterations = 1000000
+num_iterations = 2000000
 eval_step = 1000
 promote_step = 100000
 start = time.time()
@@ -57,7 +57,7 @@ loss = 0
 while step <= num_iterations:
     if LOCAL:
         train_env.render()
-    replay_buffer.collect_steps(train_env, dqn.agent.collect_policy, dqn=dqn)
+    replay_buffer.collect_steps(train_env, dqn.agent.collect_policy)
     experience, _ = next(iterator)
     loss += dqn.agent.train(experience).loss
     # Evaluation

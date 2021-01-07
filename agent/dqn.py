@@ -30,17 +30,16 @@ class DQN():
                 keras.layers.Flatten(),
                 keras.layers.Dense(768, activation='relu'),
             ])
-            accum = keras.Sequential([
-                keras.layers.Dense(768, activation='relu'),
-                keras.layers.Dense(768, activation='relu'),
-            ])
-            combiner = keras.layers.Concatenate(axis=-1)
+            # accum = keras.Sequential([
+            #     keras.layers.Dense(768, activation='relu'),
+            #     keras.layers.Dense(768, activation='relu'),
+            # ])
+            # combiner = keras.layers.Concatenate(axis=-1)
             self.q_net = categorical_q_network.CategoricalQNetwork(
                 self.env.observation_spec(),
                 self.env.action_spec(),
                 num_atoms=51,
-                preprocessing_layers={'image': conv, 'vector': accum},
-                preprocessing_combiner=combiner,
+                preprocessing_layers=conv,
                 fc_layer_params=(512, 256),
             )
             # Agent
