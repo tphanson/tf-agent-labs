@@ -67,14 +67,15 @@ class DQN():
             keras.layers.Dense(768, activation='relu'),
         ])
         x = conv(x)
-        (batch_size, _) = x.shape
+        # print(x.shape)
+        # (batch_size, _) = x.shape
         # Feedback layer
         feed = keras.Sequential([
             keras.layers.Dense(768, activation='relu'),
             keras.layers.Dense(768, activation='relu'),
         ])
-        zeros = tf.zeros([batch_size, 256])
-        v = feed(zeros)
+        # zeros = tf.zeros([batch_size, 256])
+        v = feed(x)
         # Combiner
         conc = keras.layers.Concatenate()
         y = conc([x, v])
