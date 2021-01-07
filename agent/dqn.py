@@ -72,8 +72,8 @@ class DQN():
             keras.layers.Dense(768, activation='relu'),
             keras.layers.Dense(768, activation='relu'),
         ])
-        zeros = tf.zeros((None, 256))
-        v = feed(zeros)
+        zeros = tf.zeros((256,))
+        v = feed([zeros])
         # Combiner
         conc = keras.layers.Concatenate()
         y = conc([x, v])
