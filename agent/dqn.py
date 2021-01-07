@@ -55,6 +55,7 @@ class DQN():
         x = keras.layers.Input(shape=(96, 96, 3), batch_size=batch_size)
         # Convolutional layer
         conv = keras.Sequential([  # (96, 96, *)
+            keras.layers.Input(shape=(96, 96, 3), batch_size=batch_size),
             keras.layers.Conv2D(  # (92, 92, *)
                 filters=32, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
             keras.layers.MaxPooling2D((2, 2)),  # (46, 46, *)
@@ -67,9 +68,10 @@ class DQN():
             keras.layers.Flatten(),
             keras.layers.Dense(768, activation='relu'),
         ])
-        y = conv(x)
+        x = conv(x)
         # Feedback layer
         feed = keras.Sequential([
+            keras.layers.Input(shape=(256,), batch_size=batch_size),
             keras.layers.Dense(768, activation='relu'),
             keras.layers.Dense(768, activation='relu'),
         ])
@@ -77,7 +79,7 @@ class DQN():
         v = feed(zeros)
         # Combiner
         conc = keras.layers.Concatenate()
-        y = conc([y, v])
+        y = conc([x, v])
         # Output layer
         return keras.Model(inputs=x, outputs=y)
 
