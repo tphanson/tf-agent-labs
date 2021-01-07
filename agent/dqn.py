@@ -51,7 +51,8 @@ class DQN():
 
     def _build_processor(self):
         # Input layer
-        x = keras.layers.Input(shape=(96, 96, 3))
+        batch_size = 32
+        x = keras.layers.Input(shape=(96, 96, 3), batch_size=batch_size)
         # Convolutional layer
         conv = keras.Sequential([  # (96, 96, *)
             keras.layers.Conv2D(  # (92, 92, *)
@@ -67,16 +68,16 @@ class DQN():
             keras.layers.Dense(768, activation='relu'),
         ])
         y = conv(x)
-        # # Feedback layer
-        # feed = keras.Sequential([
-        #     keras.layers.Dense(768, activation='relu'),
-        #     keras.layers.Dense(768, activation='relu'),
-        # ])
-        # # zeros = tf.zeros([32, 256])
-        # v = feed(x)
-        # # Combiner
-        # conc = keras.layers.Concatenate()
-        # y = conc([x, v])
+        # Feedback layer
+        feed = keras.Sequential([
+            keras.layers.Dense(768, activation='relu'),
+            keras.layers.Dense(768, activation='relu'),
+        ])
+        zeros = tf.zeros([batch_size, 256])
+        v = feed(zeros)
+        # Combiner
+        conc = keras.layers.Concatenate()
+        y = conc([x, v])
         # Output layer
         return keras.Model(inputs=x, outputs=y)
 
