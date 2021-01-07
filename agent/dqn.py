@@ -66,6 +66,7 @@ class DQN():
             keras.layers.Flatten(),
             keras.layers.Dense(768, activation='relu'),
         ])
+        x = conv.input
         y = conv(x)
         # # Feedback layer
         # feed = keras.Sequential([
@@ -78,7 +79,7 @@ class DQN():
         # conc = keras.layers.Concatenate()
         # y = conc([x, v])
         # Output layer
-        return keras.Model(inputs=conv.input, outputs=y)
+        return keras.Model(inputs=x, outputs=y)
 
     def call_encoder(self, inputs):
         return self.encoder(inputs)
