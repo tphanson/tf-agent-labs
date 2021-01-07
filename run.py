@@ -21,7 +21,8 @@ dqn.load_checkpoint()
 counter = 0
 promote_step = 100000
 step = dqn.agent.train_step_counter.numpy()
-difficulty = min(step // promote_step, 15)
+# difficulty = min(step // promote_step, 15)
+difficulty = 10
 OhmniInSpace.promote_difficulty(env, difficulty)
 while counter < 10000:
     counter += 1
