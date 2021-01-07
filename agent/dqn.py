@@ -69,11 +69,11 @@ class DQN():
         x = conv(x)
         # Feedback layer
         feed = keras.Sequential([
+            keras.layers.Flatten(),
             keras.layers.Dense(768, activation='relu'),
             keras.layers.Dense(768, activation='relu'),
         ])
-        zeros = tf.zeros([8, 256])
-        v = feed(zeros)
+        v = feed(x)
         # Combiner
         conc = keras.layers.Concatenate()
         y = conc([x, v])
