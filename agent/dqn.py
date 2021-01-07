@@ -66,17 +66,17 @@ class DQN():
             keras.layers.Flatten(),
             keras.layers.Dense(768, activation='relu'),
         ])
-        y = conv(x)
-        # # Feedback layer
-        # feed = keras.Sequential([
-        #     keras.layers.Dense(768, activation='relu'),
-        #     keras.layers.Dense(768, activation='relu'),
-        # ])
+        x = conv(x)
+        # Feedback layer
+        feed = keras.Sequential([
+            keras.layers.Dense(768, activation='relu'),
+            keras.layers.Dense(768, activation='relu'),
+        ])
         # zeros = tf.zeros([32, 256])
-        # v = feed(zeros)
-        # # Combiner
-        # conc = keras.layers.Concatenate()
-        # y = conc([x, v])
+        v = feed(x)
+        # Combiner
+        conc = keras.layers.Concatenate()
+        y = conc([x, v])
         # Output layer
         return keras.Model(inputs=x, outputs=y)
 
