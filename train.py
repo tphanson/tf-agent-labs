@@ -48,7 +48,7 @@ replay_buffer.collect_steps(
     rs=dqn.reset_states,
     steps=initial_collect_steps
 )
-dataset = replay_buffer.as_dataset()
+dataset = replay_buffer.as_dataset(sample_batch_size=1)
 iterator = iter(dataset)
 
 # Train
