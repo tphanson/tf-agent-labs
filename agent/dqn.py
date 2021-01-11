@@ -26,7 +26,7 @@ class DQN():
             keras.layers.Flatten(),
             keras.layers.Dense(768, activation='relu'),
             keras.layers.Reshape((1, 768)),
-            keras.layers.GRU(512, stateful=True, name='feedback_layer'),
+            keras.layers.GRU(512, stateful=True, name='feedback'),
             keras.layers.Dense(512, activation='relu'),
         ])
         self.q_net = categorical_q_network.CategoricalQNetwork(
@@ -57,15 +57,11 @@ class DQN():
             policy=self.agent.policy,
             global_step=self.global_step
         )
-        # Must be called after initialization
-        # QNET->Encoding->Sequential->Feedback
-        self.q_net.get_layer(
-            index=0).get_layer(index=0).get_layer(index=0).summary()
-        self.preprocessing_layers = self.q_net.get_layer(
-            index=0).get_layer(index=0).get_layer(index=0).get_layer(name='feedback_layer')
 
     def reset_states(self):
-        return self.preprocessing_layers.reset_states()
+        # Must be called after initialization
+        # QNET->Encoding->Sequential->Feedback
+        return self.q_net.get_layer(index=0).get_layer(index=0).get_layer(index=0).get_layer(name='feedback').reset_states()
 
     def save_checkpoint(self):
         self.checkpointer.save(self.global_step)
