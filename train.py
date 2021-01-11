@@ -57,12 +57,13 @@ loss = 0
 while step <= num_iterations:
     if LOCAL:
         train_env.render()
-    replay_buffer.collect_steps(train_env, dqn.agent.collect_policy)
+    replay_buffer.collect_steps(train_env, dqn)
     experience, _ = next(iterator)
     loss += dqn.agent.train(experience).loss
     # Evaluation
     step = dqn.agent.train_step_counter.numpy()
-    difficulty = min(step // promote_step, 15)
+    # difficulty = min(step // promote_step, 15)
+    difficulty = 0
     if step % promote_step == 0:
         OhmniInSpace.promote_difficulty(train_env, difficulty)
     if step % eval_step == 0:

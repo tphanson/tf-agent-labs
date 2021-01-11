@@ -25,15 +25,15 @@ class ReplayBuffer:
             num_steps=3
         ).prefetch(3)
 
-    def collect(self, env, policy):
+    def collect(self, env, dqn):
         time_step = env.current_time_step()
-        action_step = policy.action(time_step)
+        action_step = dqn.agent.collect_policy.action(time_step)
         next_time_step = env.step(action_step.action)
         traj = trajectory.from_transition(
             time_step, action_step, next_time_step)
         self.buffer.add_batch(traj)
         if traj.is_last():
-            exit(0)
+            dqn.reset_states()
         return traj
 
     def collect_steps(self, env, policy, steps=1):
