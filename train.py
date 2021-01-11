@@ -66,7 +66,7 @@ while step <= num_iterations:
         rs=dqn.reset_states
     )
     experience, _ = next(iterator)
-    dqn.q_net.get_layer(index=0).get_layer(index=0).summary()
+    dqn.q_net.get_layer(index=0).get_layer(index=0).get_layer(index=0).summary()
     loss += dqn.agent.train(experience).loss
     # Evaluation
     step = dqn.agent.train_step_counter.numpy()
