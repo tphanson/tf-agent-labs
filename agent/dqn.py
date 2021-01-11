@@ -25,9 +25,9 @@ class DQN():
             keras.layers.MaxPooling2D((2, 2)),  # (5, 5, *)
             keras.layers.Flatten(),
             keras.layers.Dense(768, activation='relu'),
-            keras.layers.Reshape((1, 768)),
-            keras.layers.GRU(512, stateful=True, name='feedback'),
-            keras.layers.Dense(512, activation='relu'),
+            # keras.layers.Reshape((1, 768)),
+            # keras.layers.GRU(512, stateful=True, name='feedback'),
+            # keras.layers.Dense(512, activation='relu'),
         ])
         self.q_net = categorical_q_network.CategoricalQNetwork(
             self.env.observation_spec(),
@@ -57,12 +57,14 @@ class DQN():
             policy=self.agent.policy,
             global_step=self.global_step
         )
+        # Debug
+        self.q_net.get_layer(index=0).get_layer(index=0).get_layer(index=0).summary()
 
     def reset_states(self):
         # Must be called after initialization
         # QNET->Encoding->Sequential->Feedback
         print("================== Reset states")
-        return self.q_net.get_layer(index=0).get_layer(index=0).get_layer(index=0).get_layer(name='feedback').reset_states()
+        # return self.q_net.get_layer(index=0).get_layer(index=0).get_layer(index=0).get_layer(name='feedback').reset_states()
 
     def save_checkpoint(self):
         self.checkpointer.save(self.global_step)
