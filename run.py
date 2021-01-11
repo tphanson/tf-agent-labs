@@ -31,3 +31,5 @@ while counter < 10000:
     _, reward, _, _ = env.step(action)
     print('Action: {}, Reward: {}'.format(action.numpy(), reward.numpy()))
     env.render()
+    if time_step.is_last():
+        dqn.reset_states()
