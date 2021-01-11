@@ -59,6 +59,8 @@ class DQN():
         )
         # Must be called after initialization
         # QNET->Encoding->Sequential->Feedback
+        self.q_net.get_layer(
+            index=0).get_layer(index=0).get_layer(index=0).summary()
         self.preprocessing_layers = self.q_net.get_layer(
             index=0).get_layer(index=0).get_layer(index=0).get_layer(name='feedback_layer')
 
