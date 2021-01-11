@@ -57,9 +57,6 @@ class DQN():
             policy=self.agent.policy,
             global_step=self.global_step
         )
-        # Debug
-        self.q_net.get_layer(index=0).get_layer(
-            index=0).get_layer(index=0).summary()
 
     def reset_states(self):
         # Must be called after initialization
