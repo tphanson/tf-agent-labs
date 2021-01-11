@@ -17,12 +17,27 @@ class DQN():
             learning_rate=0.00001)
         with strategy_utils.get_strategy(tpu=False, use_gpu=GPU).scope():
             # Policy
-            self.processor = self._build_processor()
+            self.feedback = keras.Sequential([  # (96, 96, *)
+                keras.layers.Conv2D(  # (92, 92, *)
+                    filters=32, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
+                keras.layers.MaxPooling2D((2, 2)),  # (46, 46, *)
+                keras.layers.Conv2D(  # (42, 42, 32)
+                    filters=64, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
+                keras.layers.MaxPooling2D((2, 2)),  # (21, 21, *)
+                keras.layers.Conv2D(  # (10, 10, *)
+                    filters=128, kernel_size=(3, 3), strides=(2, 2), activation='relu'),
+                keras.layers.MaxPooling2D((2, 2)),  # (5, 5, *)
+                keras.layers.Flatten(),
+                keras.layers.Dense(768, activation='relu'),
+                keras.layers.Reshape((1, 768)),
+                keras.layers.GRU(512, stateful=True),
+                keras.layers.Dense(512, activation='relu'),
+            ])
             self.q_net = categorical_q_network.CategoricalQNetwork(
                 self.env.observation_spec(),
                 self.env.action_spec(),
                 num_atoms=51,
-                preprocessing_layers=self.processor,
+                preprocessing_layers=self.feedback,
                 fc_layer_params=(512, 256),
             )
             # Agent
@@ -46,38 +61,9 @@ class DQN():
             policy=self.agent.policy,
             global_step=self.global_step
         )
-        # Accumulative layer (infinite-term memory)
-        self.encoder = self.q_net.get_layer(index=0).get_layer(index=0)
 
-    def _build_processor(self):
-        # Input layer
-        x = keras.layers.Input(shape=(96, 96, 3))
-        # Convolutional layer
-        conv = keras.Sequential([  # (96, 96, *)
-            keras.layers.Conv2D(  # (92, 92, *)
-                filters=32, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
-            keras.layers.MaxPooling2D((2, 2)),  # (46, 46, *)
-            keras.layers.Conv2D(  # (42, 42, 32)
-                filters=64, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
-            keras.layers.MaxPooling2D((2, 2)),  # (21, 21, *)
-            keras.layers.Conv2D(  # (10, 10, *)
-                filters=128, kernel_size=(3, 3), strides=(2, 2), activation='relu'),
-            keras.layers.MaxPooling2D((2, 2)),  # (5, 5, *)
-            keras.layers.Flatten(),
-            keras.layers.Dense(768, activation='relu'),
-        ])
-        x = conv(x)
-        # Feedback layer
-        memo = keras.Sequential([
-            keras.layers.GRU(512, stateful=True),
-            keras.layers.Dense(512, activation='relu'),
-        ])
-        y = memo(x)
-        # Output layer
-        return keras.Model(inputs=x, outputs=y)
-
-    def call_encoder(self, inputs):
-        return self.encoder(inputs)
+    def reset_states(self):
+        return self.feedback.reset_states()
 
     def save_checkpoint(self):
         self.checkpointer.save(self.global_step)

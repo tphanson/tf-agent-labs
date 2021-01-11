@@ -32,6 +32,8 @@ class ReplayBuffer:
         traj = trajectory.from_transition(
             time_step, action_step, next_time_step)
         self.buffer.add_batch(traj)
+        if traj.is_last():
+            exit(0)
         return traj
 
     def collect_steps(self, env, policy, steps=1):
