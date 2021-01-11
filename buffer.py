@@ -32,8 +32,8 @@ class ReplayBuffer:
         traj = trajectory.from_transition(
             time_step, action_step, next_time_step)
         self.buffer.add_batch(traj)
-        if traj.is_last() and reset_agent_states is not None:
-            reset_agent_states()
+        if traj.is_last() and rs is not None:
+            rs()
         return traj
 
     def collect_steps(self, env, policy, rs=None, steps=1):
