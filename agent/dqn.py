@@ -58,13 +58,14 @@ class DQN():
             global_step=self.global_step
         )
         # Debug
-        self.q_net.get_layer(index=0).get_layer(index=0).get_layer(index=0).summary()
+        self.q_net.get_layer(index=0).get_layer(
+            index=0).get_layer(index=0).summary()
 
     def reset_states(self):
         # Must be called after initialization
         # QNET->Encoding->Sequential->Feedback
-        print("================== Reset states")
         # return self.q_net.get_layer(index=0).get_layer(index=0).get_layer(index=0).get_layer(name='feedback').reset_states()
+        pass
 
     def save_checkpoint(self):
         self.checkpointer.save(self.global_step)
