@@ -26,7 +26,7 @@ class DQN():
             keras.layers.Flatten(),
             keras.layers.Dense(768, activation='relu'),
             keras.layers.Reshape((1, 768)),
-            keras.layers.GRU(512, stateful=True, name='feedback'),
+            keras.layers.GRU(512, name='feedback'),
             keras.layers.Dense(512, activation='relu'),
         ])
         self.q_net = categorical_q_network.CategoricalQNetwork(
