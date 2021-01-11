@@ -14,7 +14,6 @@ class DQN():
             learning_rate=0.00001)
         # Policy
         self.feedback = keras.Sequential([  # (96, 96, *)
-            # keras.layers.Input(shape=(96, 96, 3), batch_size=32),
             keras.layers.Conv2D(  # (92, 92, *)
                 filters=32, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
             keras.layers.MaxPooling2D((2, 2)),  # (46, 46, *)
@@ -27,10 +26,9 @@ class DQN():
             keras.layers.Flatten(),
             keras.layers.Dense(768, activation='relu'),
             keras.layers.Reshape((1, 768)),
-            keras.layers.GRU(512, stateful=True),
+            keras.layers.GRU(512, stateful=True, name='feedback_layer'),
             keras.layers.Dense(512, activation='relu'),
         ])
-        # self.feedback.summary()
         self.q_net = categorical_q_network.CategoricalQNetwork(
             self.env.observation_spec(),
             self.env.action_spec(),
@@ -59,9 +57,12 @@ class DQN():
             policy=self.agent.policy,
             global_step=self.global_step
         )
+        # Must be called after initialization
+        self.preprocessing_layers = self.q_net.get_layer(
+            index=0).get_layer(index=0).get_layer(index=0).get_layer(name='feedback_layer')
 
     def reset_states(self):
-        return self.feedback.reset_states()
+        return self.preprocessing_layers.reset_states()
 
     def save_checkpoint(self):
         self.checkpointer.save(self.global_step)
