@@ -58,6 +58,7 @@ class DQN():
             global_step=self.global_step
         )
         # Must be called after initialization
+        # QNET->Encoding->Sequential->Feedback
         self.preprocessing_layers = self.q_net.get_layer(
             index=0).get_layer(index=0).get_layer(index=0).get_layer(name='feedback_layer')
 
