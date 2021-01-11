@@ -44,7 +44,10 @@ random_policy = random_tf_policy.RandomTFPolicy(
     train_env.time_step_spec(),
     train_env.action_spec())
 replay_buffer.collect_steps(
-    train_env, random_policy, steps=initial_collect_steps)
+    train_env, random_policy,
+    rs=dqn.reset_states,
+    steps=initial_collect_steps
+)
 dataset = replay_buffer.as_dataset()
 iterator = iter(dataset)
 
@@ -57,7 +60,11 @@ loss = 0
 while step <= num_iterations:
     if LOCAL:
         train_env.render()
-    replay_buffer.collect_steps(train_env, dqn)
+    replay_buffer.collect_steps(
+        train_env,
+        dqn.agent.collect_policy,
+        rs=dqn.reset_states
+    )
     experience, _ = next(iterator)
     loss += dqn.agent.train(experience).loss
     # Evaluation
