@@ -27,7 +27,7 @@ class EvalActor(object):
         time_step = self.env.reset()
         steps = self.max_steps
         episode_return = 0.0
-        state = self.dqn.agent.get_initial_state()
+        state = self.dqn.q_net.get_initial_state()
         while not time_step.is_last():
             steps -= 1
             policy_step = self.dqn.agent.policy.action(time_step, state)

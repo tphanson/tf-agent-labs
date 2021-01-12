@@ -3,9 +3,9 @@ from tf_agents.trajectories import trajectory
 
 
 class ReplayBuffer:
-    def __init__(self, agent, batch_size=1):
-        self.data_spec = agent.collect_data_spec
-        self._rs = agent.get_initial_state
+    def __init__(self, dqn, batch_size=1):
+        self.data_spec = dqn.agent.collect_data_spec
+        self._rs = dqn.q_net.get_initial_state
         self.state = None
         self.batch_size = batch_size
         self.replay_buffer_capacity = 10000
