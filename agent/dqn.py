@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
-from tf_agents.agents import categorical_dqn
-from tf_agents.networks import categorical_q_network
+from tf_agents.agents import DqnAgent
+from tf_agents.networks import q_network
 from tf_agents.utils import common
 
 
@@ -13,7 +13,7 @@ class DQN():
         self.optimizer = tf.compat.v1.train.AdamOptimizer(
             learning_rate=0.00001)
         # Policy
-        self.feedback = keras.Sequential([  # (96, 96, *)
+        self.conv = keras.Sequential([  # (96, 96, *)
             keras.layers.Conv2D(  # (92, 92, *)
                 filters=32, kernel_size=(5, 5), strides=(1, 1), activation='relu'),
             keras.layers.MaxPooling2D((2, 2)),  # (46, 46, *)
@@ -25,25 +25,19 @@ class DQN():
             keras.layers.MaxPooling2D((2, 2)),  # (5, 5, *)
             keras.layers.Flatten(),
             keras.layers.Dense(768, activation='relu'),
-            keras.layers.Reshape((1, 768)),
-            keras.layers.GRU(512, stateful=True, name='feedback'),
-            keras.layers.Dense(512, activation='relu'),
         ])
-        self.q_net = categorical_q_network.CategoricalQNetwork(
+        self.q_net = q_network.QNetwork(
             self.env.observation_spec(),
             self.env.action_spec(),
-            num_atoms=51,
-            preprocessing_layers=self.feedback,
+            preprocessing_layers=self.conv,
             fc_layer_params=(512, 256),
         )
         # Agent
-        self.agent = categorical_dqn.categorical_dqn_agent.CategoricalDqnAgent(
+        self.agent = DqnAgent(
             self.env.time_step_spec(),
             self.env.action_spec(),
-            categorical_q_network=self.q_net,
+            q_network=self.q_net,
             optimizer=self.optimizer,
-            min_q_value=-3,
-            max_q_value=1,
             n_step_update=2,
             td_errors_loss_fn=common.element_wise_squared_loss,
             train_step_counter=self.global_step)
@@ -57,12 +51,6 @@ class DQN():
             policy=self.agent.policy,
             global_step=self.global_step
         )
-
-    def reset_states(self):
-        # Must be called after initialization
-        # QNET->Encoding->Sequential->Feedback
-        # return self.q_net.get_layer(index=0).get_layer(index=0).get_layer(index=0).get_layer(name='feedback').reset_states()
-        pass
 
     def save_checkpoint(self):
         self.checkpointer.save(self.global_step)

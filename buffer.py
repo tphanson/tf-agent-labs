@@ -25,17 +25,15 @@ class ReplayBuffer:
             num_steps=3
         ).prefetch(3)
 
-    def collect(self, env, policy, rs=None):
+    def collect(self, env, policy):
         time_step = env.current_time_step()
         action_step = policy.action(time_step)
         next_time_step = env.step(action_step.action)
         traj = trajectory.from_transition(
             time_step, action_step, next_time_step)
         self.buffer.add_batch(traj)
-        if traj.is_last() and rs is not None:
-            rs()
         return traj
 
-    def collect_steps(self, env, policy, rs=None, steps=1):
+    def collect_steps(self, env, policy, steps=1):
         for _ in range(steps):
-            self.collect(env, policy, rs)
+            self.collect(env, policy)
