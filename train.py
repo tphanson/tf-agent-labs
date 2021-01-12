@@ -37,11 +37,11 @@ ER = ExpectedReturn()
 initial_collect_steps = 2000
 replay_buffer = ReplayBuffer(dqn, batch_size=train_env.batch_size)
 # Init buffer
-random_policy = random_tf_policy.RandomTFPolicy(
-    train_env.time_step_spec(),
-    train_env.action_spec())
+# random_policy = random_tf_policy.RandomTFPolicy(
+#     train_env.time_step_spec(),
+#     train_env.action_spec())
 replay_buffer.collect_steps(
-    train_env, random_policy,
+    train_env, dqn.agent.collect_policy,
     steps=initial_collect_steps
 )
 dataset = replay_buffer.as_dataset()
