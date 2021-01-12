@@ -3,8 +3,10 @@ from tf_agents.trajectories import trajectory
 
 
 class ReplayBuffer:
-    def __init__(self, data_spec, batch_size=1):
-        self.data_spec = data_spec
+    def __init__(self, agent, batch_size=1):
+        self.data_spec = agent.collect_data_spec
+        self._rs = agent.get_initial_state
+        self.state = None
         self.batch_size = batch_size
         self.replay_buffer_capacity = 10000
         self.buffer = tf_uniform_replay_buffer.TFUniformReplayBuffer(
@@ -12,9 +14,14 @@ class ReplayBuffer:
             batch_size=self.batch_size,
             max_length=self.replay_buffer_capacity,
         )
+        # Reset
+        self._reset_state()
 
     def __len__(self):
         return self.buffer.num_frames()
+
+    def _reset_state(self):
+        self.state = self._rs()
 
     def clear(self):
         return self.buffer.clear()
@@ -22,16 +29,19 @@ class ReplayBuffer:
     def as_dataset(self, sample_batch_size=32):
         return self.buffer.as_dataset(
             sample_batch_size=sample_batch_size,
-            num_steps=3
+            num_steps=2
         ).prefetch(3)
 
     def collect(self, env, policy):
         time_step = env.current_time_step()
-        action_step = policy.action(time_step)
-        next_time_step = env.step(action_step.action)
+        policy_step = policy.action(time_step, self.state)
+        action, self.state, _ = policy_step
+        next_time_step = env.step(action)
         traj = trajectory.from_transition(
-            time_step, action_step, next_time_step)
+            time_step, policy_step, next_time_step)
         self.buffer.add_batch(traj)
+        if traj.is_last():
+            self._reset_state()
         return traj
 
     def collect_steps(self, env, policy, steps=1):

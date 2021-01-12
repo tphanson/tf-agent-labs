@@ -21,15 +21,17 @@ dqn.load_checkpoint()
 counter = 0
 promote_step = 100000
 step = dqn.agent.train_step_counter.numpy()
+state = dqn.q_net.get_initial_state()
 # difficulty = min(step // promote_step, 15)
 difficulty = 0
 OhmniInSpace.promote_difficulty(env, difficulty)
 while counter < 10000:
     counter += 1
     time_step = env.current_time_step()
-    action = dqn.agent.policy.action(time_step).action
+    policy_step = dqn.agent.policy.action(time_step, state)
+    action, state, _ = policy_step
+    if time_step.is_last():
+        state = dqn.q_net.get_initial_state()
     _, reward, _, _ = env.step(action)
     print('Action: {}, Reward: {}'.format(action.numpy(), reward.numpy()))
     env.render()
-    if time_step.is_last():
-        dqn.reset_states()

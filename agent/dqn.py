@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 from tf_agents.agents import DqnAgent
-from tf_agents.networks import q_network
+from tf_agents.networks import q_rnn_network
 from tf_agents.utils import common
 
 
@@ -26,11 +26,12 @@ class DQN():
             keras.layers.Flatten(),
             keras.layers.Dense(768, activation='relu'),
         ])
-        self.q_net = q_network.QNetwork(
+        self.q_net = q_rnn_network.QRnnNetwork(
             self.env.observation_spec(),
             self.env.action_spec(),
             preprocessing_layers=self.conv,
-            fc_layer_params=(512, 256),
+            lstm_size=(512,),
+            output_fc_layer_params=(512, 256),
         )
         # Agent
         self.agent = DqnAgent(
@@ -38,7 +39,6 @@ class DQN():
             self.env.action_spec(),
             q_network=self.q_net,
             optimizer=self.optimizer,
-            n_step_update=2,
             td_errors_loss_fn=common.element_wise_squared_loss,
             train_step_counter=self.global_step)
         self.agent.initialize()

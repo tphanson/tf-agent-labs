@@ -36,7 +36,7 @@ ER = ExpectedReturn()
 # Replay buffer
 initial_collect_steps = 2000
 replay_buffer = ReplayBuffer(
-    dqn.agent.collect_data_spec,
+    dqn.agent,
     batch_size=train_env.batch_size,
 )
 # Init buffer
