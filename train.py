@@ -58,8 +58,6 @@ while step <= num_iterations:
         train_env.render()
     replay_buffer.collect_steps(train_env, dqn.agent.collect_policy)
     experience, _ = next(iterator)
-    print(experience)
-    exit(0)
     loss += dqn.agent.train(experience).loss
     # Evaluation
     step = dqn.agent.train_step_counter.numpy()
