@@ -56,9 +56,6 @@ class CategoricalQRnnNetwork(network.Network):
     def num_atoms(self):
         return self._num_atoms
 
-    def get_initial_state(self):
-        return self._q_network.get_initial_state()
-
     def call(self, observation, step_type=None, network_state=(), training=False):
         logits, network_state = self._q_network(
             observation, step_type, network_state, training=training)
