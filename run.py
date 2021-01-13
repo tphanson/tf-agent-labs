@@ -23,7 +23,7 @@ promote_step = 100000
 step = dqn.agent.train_step_counter.numpy()
 state = dqn.q_net.get_initial_state()
 # difficulty = min(step // promote_step, 15)
-difficulty = 10
+difficulty = 0
 OhmniInSpace.promote_difficulty(env, difficulty)
 while counter < 10000:
     counter += 1

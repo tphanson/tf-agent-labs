@@ -62,7 +62,7 @@ while step <= num_iterations:
     # Evaluation
     step = dqn.agent.train_step_counter.numpy()
     # difficulty = min(step // promote_step, 15)
-    difficulty = 10
+    difficulty = 0
     if step % promote_step == 0:
         OhmniInSpace.promote_difficulty(train_env, difficulty)
     if step % eval_step == 0:

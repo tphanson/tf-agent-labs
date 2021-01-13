@@ -1,8 +1,9 @@
 import tensorflow as tf
 from tensorflow import keras
-from tf_agents.agents import DqnAgent
-from tf_agents.networks import q_rnn_network
+from tf_agents.agents import CategoricalDqnAgent
 from tf_agents.utils import common
+
+from networks import categorical_q_rnn_network
 
 
 class DQN():
@@ -24,21 +25,24 @@ class DQN():
                 filters=128, kernel_size=(3, 3), strides=(2, 2), activation='relu'),
             keras.layers.MaxPooling2D((2, 2)),  # (5, 5, *)
             keras.layers.Flatten(),
-            keras.layers.Dense(768, activation='relu'),
         ])
-        self.q_net = q_rnn_network.QRnnNetwork(
+        self.q_net = categorical_q_rnn_network.CategoricalQRnnNetwork(
             self.env.observation_spec(),
             self.env.action_spec(),
+            num_atoms=51,
             preprocessing_layers=self.conv,
+            input_fc_layer_params=(768,),
             lstm_size=(512,),
             output_fc_layer_params=(512, 256),
         )
         # Agent
-        self.agent = DqnAgent(
+        self.agent = CategoricalDqnAgent(
             self.env.time_step_spec(),
             self.env.action_spec(),
-            q_network=self.q_net,
+            categorical_q_network=self.q_net,
             optimizer=self.optimizer,
+            min_q_value=-3,
+            max_q_value=1,
             td_errors_loss_fn=common.element_wise_squared_loss,
             train_step_counter=self.global_step)
         self.agent.initialize()
