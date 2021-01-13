@@ -207,11 +207,11 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
                 discount = next_time_steps.discount
                 if discount.shape.rank == 1:
                     discount = tf.expand_dims(discount, -1)
+                print(discount)
+                print(tiled_support)
                 next_value_term = tf.multiply(discount,
                                               tiled_support,
                                               name='next_value_term')
-                print(discount)
-                print(tiled_support)
                 print(next_value_term)
                 exit(0)
 
