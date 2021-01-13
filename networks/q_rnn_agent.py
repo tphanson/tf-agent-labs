@@ -150,7 +150,7 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
                 trajectory.experience_to_transitions(experience, squeeze_time_dim))
             actions = policy_steps.action
             states = policy_steps.state
-            print(states)
+            print(policy_steps)
             exit(0)
         else:
             first_two_steps = tf.nest.map_structure(
