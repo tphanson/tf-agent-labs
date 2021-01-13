@@ -185,7 +185,7 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
             q_logits, _ = self._q_network(network_observation,
                                           step_type=time_steps.step_type,
                                           training=training)
-
+            print(q_logits)
             if batch_squash is not None:
                 q_logits = batch_squash.flatten(q_logits)
                 actions = batch_squash.flatten(actions)
