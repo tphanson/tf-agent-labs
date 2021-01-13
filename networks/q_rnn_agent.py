@@ -149,9 +149,6 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
             time_steps, policy_steps, next_time_steps = (
                 trajectory.experience_to_transitions(experience, squeeze_time_dim))
             actions = policy_steps.action
-            states = policy_steps.state
-            print(policy_steps)
-            exit(0)
         else:
             first_two_steps = tf.nest.map_structure(
                 lambda x: x[:, :2], experience)
@@ -213,6 +210,10 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
                 next_value_term = tf.multiply(discount,
                                               tiled_support,
                                               name='next_value_term')
+                print(discount)
+                print(tiled_support)
+                print(next_value_term)
+                exit(0)
 
                 reward = next_time_steps.reward
                 if reward.shape.rank == 1:
