@@ -168,8 +168,8 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
             nest_utils.assert_same_structure(
                 next_time_steps, self.time_step_spec)
 
-            rank = nest_utils.get_outer_rank(time_steps.observation,
-                                             self._time_step_spec.observation)
+            # rank = nest_utils.get_outer_rank(time_steps.observation,
+            #                                  self._time_step_spec.observation)
 
             # batch_squash = (None
             #                 if rank <= 1 or self._q_network.state_spec in ((), None)
@@ -183,11 +183,9 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
                     self._observation_and_action_constraint_splitter(
                         network_observation))
 
-            q_logits, _ = self._q_network(network_observation,
+            q_logits, states = self._q_network(network_observation,
                                           step_type=time_steps.step_type,
                                           training=training)
-            print(q_logits)
-            print(actions)
             if batch_squash is not None:
                 q_logits = batch_squash.flatten(q_logits)
                 actions = batch_squash.flatten(actions)
@@ -209,13 +207,9 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
                 discount = next_time_steps.discount
                 if discount.shape.rank == 1:
                     discount = tf.expand_dims(discount, -1)
-                print(discount)
-                print(tiled_support)
                 next_value_term = tf.multiply(discount,
                                               tiled_support,
                                               name='next_value_term')
-                print(next_value_term)
-                exit(0)
 
                 reward = next_time_steps.reward
                 if reward.shape.rank == 1:
