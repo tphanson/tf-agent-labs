@@ -1,9 +1,8 @@
 import tensorflow as tf
 from tensorflow import keras
-from tf_agents.agents import CategoricalDqnAgent
 from tf_agents.utils import common
 
-from networks import q_rnn_agent, categorical_q_rnn_network
+from networks import categorical_q_rnn_agent, categorical_q_rnn_network
 
 
 class DQN():
@@ -36,7 +35,7 @@ class DQN():
             output_fc_layer_params=(512, 256),
         )
         # Agent
-        self.agent = q_rnn_agent.CategoricalQRnnAgent(
+        self.agent = categorical_q_rnn_agent.CategoricalQRnnAgent(
             self.env.time_step_spec(),
             self.env.action_spec(),
             categorical_q_network=self.q_net,
