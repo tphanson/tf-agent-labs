@@ -5,7 +5,6 @@ from tf_agents.trajectories import trajectory
 class ReplayBuffer:
     def __init__(self, dqn, batch_size=1):
         self.data_spec = dqn.agent.collect_data_spec
-        print('Data spec', self.data_spec)
         self._rs = dqn.q_net.get_initial_state
         self.state = None
         self.batch_size = batch_size
@@ -40,8 +39,6 @@ class ReplayBuffer:
         next_time_step = env.step(action)
         traj = trajectory.from_transition(
             time_step, policy_step, next_time_step)
-        print('Traj spec', traj)
-        exit(0)
         self.buffer.add_batch(traj)
         if traj.is_last():
             self._reset_state()

@@ -144,9 +144,6 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
               training=False):
         self._check_trajectory_dimensions(experience)
 
-        print(experience)
-        exit(0)
-
         squeeze_time_dim = not self._q_network.state_spec
         if self._n_step_update == 1:
             time_steps, policy_steps, next_time_steps = (
@@ -178,9 +175,9 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
                     self._observation_and_action_constraint_splitter(
                         network_observation))
 
-            q_logits, states = self._q_network(network_observation,
-                                               step_type=time_steps.step_type,
-                                               training=training)
+            q_logits, _ = self._q_network(network_observation,
+                                          step_type=time_steps.step_type,
+                                          training=training)
 
             next_q_distribution = self._next_q_distribution(next_time_steps)
 
