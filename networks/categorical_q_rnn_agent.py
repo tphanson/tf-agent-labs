@@ -171,9 +171,10 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
             rank = nest_utils.get_outer_rank(time_steps.observation,
                                              self._time_step_spec.observation)
 
-            batch_squash = (None
-                            if rank <= 1 or self._q_network.state_spec in ((), None)
-                            else network_utils.BatchSquash(rank))
+            # batch_squash = (None
+            #                 if rank <= 1 or self._q_network.state_spec in ((), None)
+            #                 else network_utils.BatchSquash(rank))
+            batch_squash = None
 
             network_observation = time_steps.observation
 
