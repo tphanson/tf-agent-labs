@@ -144,6 +144,9 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
               training=False):
         self._check_trajectory_dimensions(experience)
 
+        print(experience)
+        exit(0)
+
         squeeze_time_dim = not self._q_network.state_spec
         if self._n_step_update == 1:
             time_steps, policy_steps, next_time_steps = (
@@ -168,14 +171,6 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
             nest_utils.assert_same_structure(
                 next_time_steps, self.time_step_spec)
 
-            # rank = nest_utils.get_outer_rank(time_steps.observation,
-            #                                  self._time_step_spec.observation)
-
-            # batch_squash = (None
-            #                 if rank <= 1 or self._q_network.state_spec in ((), None)
-            #                 else network_utils.BatchSquash(rank))
-            batch_squash = None
-
             network_observation = time_steps.observation
 
             if self._observation_and_action_constraint_splitter is not None:
@@ -184,13 +179,8 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
                         network_observation))
 
             q_logits, states = self._q_network(network_observation,
-                                          step_type=time_steps.step_type,
-                                          training=training)
-            if batch_squash is not None:
-                q_logits = batch_squash.flatten(q_logits)
-                actions = batch_squash.flatten(actions)
-                next_time_steps = tf.nest.map_structure(batch_squash.flatten,
-                                                        next_time_steps)
+                                               step_type=time_steps.step_type,
+                                               training=training)
 
             next_q_distribution = self._next_q_distribution(next_time_steps)
 
@@ -251,20 +241,9 @@ class CategoricalQRnnAgent(dqn_agent.DqnAgent):
             reshaped_actions = tf.stack([indices, actions], axis=-1)
             chosen_action_logits = tf.gather_nd(q_logits, reshaped_actions)
 
-            if batch_squash is not None:
-                target_distribution = batch_squash.unflatten(
-                    target_distribution)
-                chosen_action_logits = batch_squash.unflatten(
-                    chosen_action_logits)
-                critic_loss = tf.reduce_sum(
-                    tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(
-                        labels=target_distribution,
-                        logits=chosen_action_logits),
-                    axis=1)
-            else:
-                critic_loss = tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(
-                    labels=target_distribution,
-                    logits=chosen_action_logits)
+            critic_loss = tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(
+                labels=target_distribution,
+                logits=chosen_action_logits)
 
             agg_loss = common.aggregate_losses(
                 per_example_loss=critic_loss,
